@@ -1,50 +1,15 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
-import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+import SiteLayout from '../layouts/SiteLayout.astro';
 ---
-
-<!doctype html>
-<html lang="en">
-	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-	</head>
-	<body>
-		<Header />
-		<main>
-			<h1>🧑‍🚀 Hello, Astronaut!</h1>
-			<p>
-				Welcome to the official <a href="https://astro.build/">Astro</a> blog starter template. This
-				template serves as a lightweight, minimally-styled starting point for anyone looking to build
-				a personal website, blog, or portfolio with Astro.
-			</p>
-			<p>
-				This template comes with a few integrations already configured in your
-				<code>astro.config.mjs</code> file. You can customize your setup with
-				<a href="https://astro.build/integrations">Astro Integrations</a> to add tools like Tailwind,
-				React, or Vue to your project.
-			</p>
-			<p>Here are a few ideas on how to get started with the template:</p>
-			<ul>
-				<li>Edit this page in <code>src/pages/index.astro</code></li>
-				<li>Edit the site header items in <code>src/components/Header.astro</code></li>
-				<li>Add your name to the footer in <code>src/components/Footer.astro</code></li>
-				<li>Check out the included blog posts in <code>src/content/blog/</code></li>
-				<li>Customize the blog post page layout in <code>src/layouts/BlogPost.astro</code></li>
-			</ul>
-			<p>
-				Have fun! If you get stuck, remember to <a href="https://docs.astro.build/"
-					>read the docs
-				</a> or <a href="https://astro.build/chat">join us on Discord</a> to ask questions.
-			</p>
-			<p>
-				Looking for a blog template with a bit more personality? Check out <a
-					href="https://github.com/Charca/astro-blog-template"
-					>astro-blog-template
-				</a> by <a href="https://twitter.com/Charca">Maxi Ferreira</a>.
-			</p>
-		</main>
-		<Footer />
-	</body>
-</html>
+<SiteLayout title="Find a Clearer Path to Health Coverage" description="Independent, plain-language health coverage guidance for major life changes, starting in Florida." funnelContext="general">
+  <section class="hero"><div class="container hero-grid">
+    <div class="hero-copy"><p class="eyebrow">Coverage guidance for real-life changes</p><h1>Find your next health coverage path.</h1><p>Understand the deadlines, compare the tradeoffs and request help from a licensed professional when you are ready.</p><div class="hero-actions"><a class="button" href="/florida/">Explore Florida options</a><button class="button secondary" type="button" data-funnel-open data-analytics="home_hero_cta">Check My Options</button></div><p class="trust-line">Independent guidance · No government affiliation · No medical-history questions</p></div>
+    <aside class="path-card"><p class="eyebrow">Built around the change</p><div class="path-step"><span class="path-num">01</span><div><strong>Coverage ended</strong><span>Job loss, Medicaid loss or aging off a parent’s plan.</span></div></div><div class="path-step"><span class="path-num">02</span><div><strong>Work changed</strong><span>Self-employed, 1099 or between jobs.</span></div></div><div class="path-step"><span class="path-num">03</span><div><strong>Timing changed</strong><span>Check a possible Special Enrollment Period.</span></div></div></aside>
+  </div></section>
+  <section class="section"><div class="container"><div class="section-head"><p class="eyebrow">Florida launch</p><h2>Start with the situation you are in.</h2><p class="muted">Each guide answers the immediate question first, then opens the same qualification path with the right starting prompt.</p></div><div class="grid-3">
+    <a class="card link-card" href="/florida/health-insurance-after-losing-job/"><h3>Lost job coverage</h3><p>Marketplace, COBRA, spouse coverage and timing.</p><span class="link-arrow">Read the guide →</span></a>
+    <a class="card link-card" href="/florida/losing-medicaid/"><h3>Losing Medicaid</h3><p>Renewal, appeal, Marketplace and KidCare paths.</p><span class="link-arrow">See next steps →</span></a>
+    <a class="card link-card" href="/florida/turning-26/"><h3>Turning 26</h3><p>Coordinate the end date and replacement coverage.</p><span class="link-arrow">Compare options →</span></a>
+  </div></div></section>
+  <section class="section tint"><div class="container cta-panel"><div><h2>Florida first. Ready to expand nationally.</h2><p>HealthCoveragePath launches with focused Florida guidance while keeping every state’s content and rules in a separate, expandable path.</p></div><a class="button" href="/florida/">View Florida guides</a></div></section>
+</SiteLayout>

@@ -1,0 +1,33 @@
+---
+import SiteLayout from '../../layouts/SiteLayout.astro';
+const schema = { '@context': 'https://schema.org', '@type': 'WebApplication', name: '2026 ACA Income and FPL Estimator', applicationCategory: 'FinanceApplication', operatingSystem: 'Web', isAccessibleForFree: true, description: 'Estimates household income as a percentage of the federal poverty guideline used for 2026 Marketplace coverage.' };
+---
+<SiteLayout title="2026 ACA Subsidy & FPL Estimator for Florida" description="Estimate your household income as a percentage of the poverty guideline used for 2026 ACA Marketplace coverage in Florida. Results are educational, not an eligibility decision." schema={schema} funnelContext="general">
+  <section class="hero"><div class="container hero-grid"><div class="hero-copy"><p class="eyebrow">Florida · 2026 coverage estimator</p><h1>Estimate your ACA income level before you apply.</h1><p>This calculator shows your estimated federal poverty level percentage and the baseline income band historically tied to Marketplace premium tax credits. It does not quote a plan or guarantee savings.</p></div>
+  <div class="calculator" id="aca-calculator"><div class="field"><label for="calc-household">Tax household size</label><select id="calc-household">{Array.from({length: 10}, (_, i) => <option value={i+1}>{i+1}{i === 9 ? '+' : ''}</option>)}</select></div><div class="field"><label for="calc-income">Expected 2026 household income</label><input id="calc-income" type="number" min="0" step="500" inputmode="decimal" placeholder="45000" /></div><button class="button" type="button" id="calculate">Estimate my income level</button><div class="calc-result" id="calc-result" aria-live="polite"><span class="muted">Enter your household size and expected full-year income.</span></div></div></div></section>
+  <section class="section"><div class="narrow">
+    <section class="content-section"><h2>What this estimator uses</h2><p>Marketplace savings for a coverage year generally use the prior year’s federal poverty guidelines. For 2026 coverage in the contiguous United States, this estimator uses the 2025 HHS guideline: $15,650 for one person, plus $5,500 for each additional household member.</p><div class="callout warning"><strong>This is not a premium quote.</strong><p>Your actual premium tax credit depends on the second-lowest-cost Silver plan where you live, ages, tax household, expected income, immigration status and access to Medicaid, Medicare or affordable employer coverage.</p></div></section>
+    <section class="content-section"><h2>What changed for 2026</h2><p>The enhanced premium tax credits available from 2021 through 2025 expired. The original statutory structure generally limits premium tax credits to qualifying households between 100% and 400% of the applicable federal poverty level. Other rules can change the result, and lawfully present immigrants below 100% FPL may have a different path.</p><p>Florida has not adopted the ACA adult Medicaid expansion. Some adults below 100% FPL can fall into a coverage gap if they do not qualify for Florida Medicaid under another category. Children and pregnant applicants have different public-program rules.</p></section>
+    <section class="content-section"><h2>Income is an annual estimate</h2><p>Use expected income for everyone in the tax household for all of 2026—not only what you earn today. Include income types required by the Marketplace, and update HealthCare.gov if the estimate changes. Self-employed applicants generally use expected net business income rather than gross receipts.</p></section>
+    <section class="content-section"><h2>Official sources</h2><ul class="source-list"><li><a href="https://aspe.hhs.gov/topics/poverty-economic-mobility/poverty-guidelines/prior-hhs-poverty-guidelines-federal-register-references/2025-poverty-guidelines">HHS ASPE — 2025 Poverty Guidelines</a></li><li><a href="https://www.healthcare.gov/income-and-household-information/">HealthCare.gov — Income and household information</a></li><li><a href="https://www.healthcare.gov/lower-costs/">HealthCare.gov — Savings and costs</a></li><li><a href="https://www.cms.gov/newsroom/fact-sheets/2025-marketplace-integrity-and-affordability-final-rule">CMS — 2026 Marketplace policy changes</a></li></ul><p class="source-list">Reviewed September 9, 2026.</p></section>
+    <div class="cta-panel"><div><h2>Want help with the rest of the picture?</h2><p>Start with your timing and ZIP, then add household details before contact information.</p></div><button class="button" type="button" data-funnel-open data-analytics="calculator_cta">Check My Options</button></div>
+  </div></section>
+</SiteLayout>
+<script>
+  const household = document.querySelector<HTMLSelectElement>('#calc-household');
+  const income = document.querySelector<HTMLInputElement>('#calc-income');
+  const result = document.querySelector<HTMLElement>('#calc-result');
+  document.querySelector('#calculate')?.addEventListener('click', () => {
+    if (!household || !income || !result) return;
+    const size = Number(household.value);
+    const annual = Number(income.value);
+    if (!Number.isFinite(annual) || annual < 0) { result.textContent = 'Enter a valid expected annual household income.'; return; }
+    const guideline = 15650 + Math.max(0, size - 1) * 5500;
+    const percent = annual / guideline * 100;
+    let note = 'This falls within the baseline 100%–400% FPL income band where a qualifying household may receive a premium tax credit.';
+    if (percent < 100) note = 'This is below 100% FPL. Florida’s limited adult Medicaid rules can create a coverage gap, though children, pregnant applicants and other groups use different rules.';
+    if (percent > 400) note = 'This is above 400% FPL. With the enhanced credits expired for 2026, the baseline federal premium tax credit generally ends above this level.';
+    result.innerHTML = `<span class="calc-number">${Math.round(percent)}% FPL</span><strong>2026 income estimate:</strong> ${annual.toLocaleString('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0})}<br><strong>Guideline used:</strong> ${guideline.toLocaleString('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0})}<p>${note}</p><p class="consent-copy">Estimate only. HealthCare.gov makes the official determination.</p>`;
+    window.dispatchEvent(new CustomEvent('hcp:analytics', { detail: { event: 'calculator_complete', landing_page: location.pathname, fpl_band: percent < 100 ? 'under_100' : percent <= 400 ? '100_400' : 'over_400' } }));
+  });
+</script>
