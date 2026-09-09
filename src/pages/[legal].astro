@@ -1,0 +1,13 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+import { legalPages } from '../data/legalPages';
+export const prerender = true;
+export function getStaticPaths() { return legalPages.map((page) => ({ params: { legal: page.slug }, props: { page } })); }
+interface Page { slug: string; title: string; description: string; intro: string; sections: { heading: string; body: string[]; note?: string }[] }
+interface Props { page: Page }
+const { page } = Astro.props;
+---
+<SiteLayout title={page.title} description={page.description}>
+  <section class="hero"><div class="narrow hero-copy"><p class="eyebrow">HealthCoveragePath</p><h1>{page.title}</h1><p>{page.intro}</p></div></section>
+  <article class="section"><div class="narrow">{page.sections.map((section) => <section class="content-section"><h2>{section.heading}</h2>{section.body.map((paragraph) => <p>{paragraph}</p>)}{section.note && <p class="source-list">{section.note}</p>}</section>)}</div></article>
+</SiteLayout>

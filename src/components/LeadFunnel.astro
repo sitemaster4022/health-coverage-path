@@ -1,0 +1,190 @@
+---
+import { CONSENT_TEXT, CONSENT_VERSION } from '../consts';
+interface Props { context?: string }
+const { context = 'general' } = Astro.props;
+const prompts: Record<string, string> = {
+  job_loss: 'When did your employer coverage end—or when will it end?',
+  medicaid_loss: 'When did your Medicaid coverage end—or when will it end?',
+  turning_26: 'When will your coverage through a parent end?',
+  cobra: 'When did your employer coverage end—or when will it end?',
+  self_employed: 'When do you need your new coverage to start?',
+  special_enrollment: 'When did your qualifying life change happen?',
+  unemployed: 'When did your previous coverage end—or when will it end?',
+  general: 'When do you need your coverage to start?',
+};
+---
+<div class="funnel-backdrop" id="lead-funnel" role="dialog" aria-modal="true" aria-labelledby="funnel-title" data-context={context} hidden>
+  <div class="funnel">
+    <div class="funnel-top">
+      <div class="funnel-topline"><strong>Check your coverage path</strong><button class="funnel-close" type="button" aria-label="Close">×</button></div>
+      <div class="progress-track" role="progressbar" aria-label="Form progress" aria-valuemin="1" aria-valuemax="8" aria-valuenow="1"><div class="progress-bar"></div></div>
+    </div>
+    <form class="funnel-body" id="lead-form" novalidate>
+      <input class="honeypot" type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true" />
+      <input type="hidden" name="context" value={context} />
+      <input type="hidden" name="consentVersion" value={CONSENT_VERSION} />
+      <section class="funnel-step active" data-step="1">
+        <p class="eyebrow">First, your timing</p>
+        <h2 id="funnel-title">{prompts[context] ?? prompts.general}</h2>
+        <div class="field"><label for="coverage-date">Coverage or life-event date</label><input id="coverage-date" name="coverageDate" type="date" required /></div>
+        <p class="muted">An approximate date is okay. Timing helps determine which enrollment windows may apply.</p>
+      </section>
+      <section class="funnel-step" data-step="2">
+        <p class="eyebrow">Your area</p><h2>What is your Florida ZIP code?</h2>
+        <div class="field"><label for="zip">ZIP code</label><input id="zip" name="zip" inputmode="numeric" autocomplete="postal-code" maxlength="5" pattern="[0-9]{5}" placeholder="34952" required /></div>
+        <p class="muted">Plan availability and prices vary by county.</p>
+      </section>
+      <section class="funnel-step" data-step="3">
+        <p class="eyebrow">Who needs coverage</p><h2>Who are you looking to cover?</h2>
+        <div class="choice-grid">
+          <label class="choice"><input type="radio" name="coverageFor" value="self" required /> Just me</label>
+          <label class="choice"><input type="radio" name="coverageFor" value="self_spouse" /> Me and my spouse</label>
+          <label class="choice"><input type="radio" name="coverageFor" value="self_children" /> Me and child or children</label>
+          <label class="choice"><input type="radio" name="coverageFor" value="family" /> My family</label>
+          <label class="choice"><input type="radio" name="coverageFor" value="other" /> Someone else</label>
+        </div>
+      </section>
+      <section class="funnel-step" data-step="4">
+        <p class="eyebrow">Household</p><h2>How many people are in your tax household?</h2>
+        <div class="field"><label for="household-size">Household size</label><select id="household-size" name="householdSize" required><option value="">Choose one</option>{Array.from({length: 8}, (_, i) => <option value={i + 1}>{i + 1}{i === 7 ? '+' : ''}</option>)}</select></div>
+        <p class="muted">This usually includes the tax filer, spouse, and tax dependents—even if they do not all need coverage.</p>
+      </section>
+      <section class="funnel-step" data-step="5">
+        <p class="eyebrow">Expected yearly income</p><h2>What do you expect your household to earn this year?</h2>
+        <div class="choice-grid">
+          <label class="choice"><input type="radio" name="incomeRange" value="under_16000" required /> Under $16,000</label>
+          <label class="choice"><input type="radio" name="incomeRange" value="16000_29999" /> $16,000–$29,999</label>
+          <label class="choice"><input type="radio" name="incomeRange" value="30000_49999" /> $30,000–$49,999</label>
+          <label class="choice"><input type="radio" name="incomeRange" value="50000_79999" /> $50,000–$79,999</label>
+          <label class="choice"><input type="radio" name="incomeRange" value="80000_plus" /> $80,000 or more</label>
+          <label class="choice"><input type="radio" name="incomeRange" value="unsure" /> I’m not sure yet</label>
+        </div>
+        <p class="muted">Marketplace savings use expected full-year household income, including income earned before a job loss.</p>
+      </section>
+      <section class="funnel-step" data-step="6">
+        <p class="eyebrow">Current situation</p><h2>Which best describes your coverage now?</h2>
+        <div class="choice-grid">
+          <label class="choice"><input type="radio" name="coverageStatus" value="ending" required /> Coverage will end soon</label>
+          <label class="choice"><input type="radio" name="coverageStatus" value="lost" /> Coverage already ended</label>
+          <label class="choice"><input type="radio" name="coverageStatus" value="cobra_offered" /> COBRA was offered</label>
+          <label class="choice"><input type="radio" name="coverageStatus" value="on_cobra" /> I’m enrolled in COBRA</label>
+          <label class="choice"><input type="radio" name="coverageStatus" value="uninsured" /> I do not currently have coverage</label>
+        </div>
+      </section>
+      <section class="funnel-step" data-step="7">
+        <p class="eyebrow">Where to send your result</p><h2>Who should we prepare the coverage review for?</h2>
+        <div class="grid-2"><div class="field"><label for="first-name">First name</label><input id="first-name" name="firstName" autocomplete="given-name" required /></div><div class="field"><label for="last-name">Last name</label><input id="last-name" name="lastName" autocomplete="family-name" required /></div></div>
+        <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" required /></div>
+      </section>
+      <section class="funnel-step" data-step="8">
+        <p class="eyebrow">Final step</p><h2>What is the best number to reach you?</h2>
+        <div class="field"><label for="phone">Phone number</label><input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="(772) 555-0123" required /></div>
+        <label class="choice"><input type="checkbox" name="consent" value="yes" required /> <span>I agree to the contact and sharing terms below.</span></label>
+        <p class="consent-copy">{CONSENT_TEXT}</p>
+        <p class="consent-copy">HealthCoveragePath is not HealthCare.gov or a government website. A licensed insurance professional or approved partner may contact you. You may also use HealthCare.gov directly without submitting this form.</p>
+      </section>
+      <section class="funnel-step" data-step="9" aria-live="polite">
+        <div class="success-mark" aria-hidden="true">✓</div><h2>Thanks—your coverage request is in.</h2><p>We saved the details you provided. If your request can be matched, a licensed insurance professional or approved coverage partner may contact you about available options.</p><p class="muted">Submitting this form does not enroll you in a plan. For immediate official Marketplace help, visit <a href="https://www.healthcare.gov/">HealthCare.gov</a>.</p>
+      </section>
+      <div class="funnel-error" id="funnel-error" role="alert"></div>
+      <div class="funnel-actions"><button class="button secondary small" type="button" data-back hidden>Back</button><button class="button" type="button" data-next>Continue</button></div>
+    </form>
+  </div>
+</div>
+<div class="mobile-cta"><button class="button" type="button" data-funnel-open data-analytics="mobile_sticky_cta">Check My Options</button></div>
+
+<script>
+  const modal = document.querySelector<HTMLElement>('#lead-funnel');
+  const form = document.querySelector<HTMLFormElement>('#lead-form');
+  const error = document.querySelector<HTMLElement>('#funnel-error');
+  const next = document.querySelector<HTMLButtonElement>('[data-next]');
+  const back = document.querySelector<HTMLButtonElement>('[data-back]');
+  const close = document.querySelector<HTMLButtonElement>('.funnel-close');
+  const steps = Array.from(document.querySelectorAll<HTMLElement>('.funnel-step'));
+  let step = 1;
+  let startedAt = 0;
+  let previousFocus: HTMLElement | null = null;
+
+  const track = (event: string, detail: Record<string, unknown> = {}) => {
+    const payload = { event, landing_page: location.pathname, funnel_context: modal?.dataset.context, ...detail };
+    window.dispatchEvent(new CustomEvent('hcp:analytics', { detail: payload }));
+    const w = window as typeof window & { dataLayer?: Record<string, unknown>[]; plausible?: (e: string, o: unknown) => void };
+    w.dataLayer?.push(payload);
+    w.plausible?.(event, { props: payload });
+  };
+
+  const show = (n: number) => {
+    step = n;
+    steps.forEach((el) => el.classList.toggle('active', Number(el.dataset.step) === n));
+    const bar = document.querySelector<HTMLElement>('.progress-bar');
+    const progress = document.querySelector<HTMLElement>('.progress-track');
+    if (bar) bar.style.width = `${Math.min(n, 8) / 8 * 100}%`;
+    progress?.setAttribute('aria-valuenow', String(Math.min(n, 8)));
+    if (back) back.hidden = n === 1 || n === 9;
+    if (next) {
+      next.hidden = n === 9;
+      next.textContent = n === 8 ? 'Check My Options' : 'Continue';
+    }
+    if (error) error.textContent = '';
+    steps.find((el) => Number(el.dataset.step) === n)?.querySelector<HTMLElement>('input, select, button')?.focus();
+  };
+
+  const currentFields = () => Array.from(steps[step - 1]?.querySelectorAll<HTMLInputElement | HTMLSelectElement>('input, select') ?? []);
+  const valid = () => {
+    for (const field of currentFields()) {
+      if (!field.checkValidity()) { field.reportValidity(); return false; }
+    }
+    if (step === 2) {
+      const zip = (form?.elements.namedItem('zip') as HTMLInputElement)?.value ?? '';
+      if (!/^3\d{4}$/.test(zip)) { if (error) error.textContent = 'Enter a valid Florida ZIP code.'; return false; }
+    }
+    return true;
+  };
+
+  const open = (trigger: HTMLElement) => {
+    if (!modal) return;
+    previousFocus = trigger;
+    startedAt = Date.now();
+    modal.hidden = false;
+    modal.classList.add('open');
+    document.body.classList.add('funnel-open');
+    show(1);
+    track('funnel_start', { cta: trigger.dataset.analytics ?? 'content_cta' });
+  };
+  const shut = () => {
+    if (!modal) return;
+    modal.classList.remove('open');
+    modal.hidden = true;
+    document.body.classList.remove('funnel-open');
+    previousFocus?.focus();
+  };
+
+  document.querySelectorAll<HTMLElement>('[data-funnel-open]').forEach((el) => el.addEventListener('click', () => { track('page_cta_click', { cta: el.dataset.analytics ?? 'content_cta' }); open(el); }));
+  close?.addEventListener('click', shut);
+  modal?.addEventListener('click', (e) => { if (e.target === modal) shut(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal?.classList.contains('open')) shut(); });
+  document.querySelectorAll<HTMLInputElement>('.choice input').forEach((input) => input.addEventListener('change', () => {
+    document.querySelectorAll(`input[name="${input.name}"]`).forEach((el) => el.closest('.choice')?.classList.remove('selected'));
+    input.closest('.choice')?.classList.add('selected');
+  }));
+  back?.addEventListener('click', () => show(Math.max(1, step - 1)));
+  next?.addEventListener('click', async () => {
+    if (!form || !valid()) return;
+    if (step < 8) { track('funnel_step_complete', { step }); show(step + 1); return; }
+    next.disabled = true; next.textContent = 'Checking…';
+    const data = Object.fromEntries(new FormData(form).entries());
+    const payload = { ...data, landingPage: location.pathname, referrer: document.referrer || null, startedAt, completedAt: Date.now(), consentText: document.querySelector('.consent-copy')?.textContent };
+    try {
+      track('lead_submit');
+      const response = await fetch('/api/leads', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload) });
+      if (!response.ok) throw new Error('submit_failed');
+      track('lead_success');
+      show(9);
+      form.reset();
+    } catch {
+      track('lead_failure');
+      if (error) error.textContent = 'We could not save your request. Please check your connection and try again.';
+      next.disabled = false; next.textContent = 'Check My Options';
+    }
+  });
+</script>

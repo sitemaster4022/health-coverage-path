@@ -1,0 +1,78 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+import type { GuidePage as Guide } from '../data/floridaPages';
+interface Props { page: Guide }
+const { page } = Astro.props;
+const canonical = `https://healthcoveragepath.com/florida/${page.slug}/`;
+const schema = [
+  { '@context': 'https://schema.org', '@type': 'Article', headline: page.title, description: page.description, mainEntityOfPage: canonical, author: { '@type': 'Organization', name: 'HealthCoveragePath' }, publisher: { '@type': 'Organization', name: 'HealthCoveragePath', url: 'https://healthcoveragepath.com/' }, dateModified: '2026-09-09' },
+  { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: page.faqs.map((faq) => ({ '@type': 'Question', name: faq.question, acceptedAnswer: { '@type': 'Answer', text: faq.answer } })) },
+  { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://healthcoveragepath.com/' },
+    { '@type': 'ListItem', position: 2, name: 'Florida', item: 'https://healthcoveragepath.com/florida/' },
+    { '@type': 'ListItem', position: 3, name: page.title, item: canonical }
+  ] }
+];
+---
+<SiteLayout title={page.metaTitle} description={page.description} schema={schema} funnelContext={page.context}>
+  <section class="hero">
+    <div class="container hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow">Florida · {page.eyebrow}</p>
+        <h1>{page.title}</h1>
+        <p>{page.quickAnswer}</p>
+        <div class="hero-actions"><button class="button" type="button" data-funnel-open data-analytics="hero_cta">{page.cta}</button><a class="button secondary" href="#guide">Read the guide</a></div>
+        <p class="trust-line">Free to check · No obligation · Contact details come later</p>
+      </div>
+      <aside class="path-card" aria-label="What happens next">
+        <p class="eyebrow">A clearer next step</p>
+        <div class="path-step"><span class="path-num">1</span><div><strong>Tell us what changed</strong><span>Start with timing and your Florida ZIP.</span></div></div>
+        <div class="path-step"><span class="path-num">2</span><div><strong>Organize your options</strong><span>We use household and coverage context—not medical history.</span></div></div>
+        <div class="path-step"><span class="path-num">3</span><div><strong>Request licensed help</strong><span>If matched, one professional or approved partner may contact you.</span></div></div>
+      </aside>
+    </div>
+  </section>
+  <div class="answer-strip"><div class="container"><strong>Important: enrollment windows can expire.</strong><span>Use the exact coverage end date and keep proof of the life event.</span></div></div>
+  <article id="guide" class="section">
+    <div class="narrow">
+      {page.sections.map((section, index) => (
+        <>
+          <section class="content-section">
+            <h2>{section.heading}</h2>
+            {section.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+            {section.bullets && <ul>{section.bullets.map((bullet) => <li>{bullet}</li>)}</ul>}
+            {page.slug === 'health-insurance-after-losing-job' && index === 0 && (
+              <div class="comparison-wrap">
+                <table class="comparison">
+                  <thead><tr><th>Compare</th><th>Marketplace</th><th>COBRA</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row">Plan</th><td>New individual policy</td><td>Continue former employer plan</td></tr>
+                    <tr><th scope="row">Premium</th><td>May include income-based tax credits</td><td>Usually full premium plus an administrative fee</td></tr>
+                    <tr><th scope="row">Doctors</th><td>Verify the new network</td><td>Usually keeps the current plan network</td></tr>
+                    <tr><th scope="row">Deductible</th><td>Generally starts with the new plan</td><td>Usually preserves current plan-year progress</td></tr>
+                    <tr><th scope="row">Typical timing</th><td>SEP around coverage loss</td><td>Election deadline in COBRA notice</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
+          {(index === 1 || (page.slug === 'health-insurance-after-losing-job' && index === 3)) && (
+            <div class="callout"><strong>Want help sorting this out?</strong><p>Answer a few timing and household questions before sharing contact details.</p><button class="button small" type="button" data-funnel-open data-analytics={`inline_cta_${index + 1}`}>{page.cta}</button></div>
+          )}
+        </>
+      ))}
+      <section class="content-section faq">
+        <p class="eyebrow">Common questions</p><h2>Frequently asked questions</h2>
+        {page.faqs.map((faq) => <details><summary>{faq.question}</summary><p>{faq.answer}</p></details>)}
+      </section>
+      <section class="content-section">
+        <p class="eyebrow">Primary sources</p><h2>Where this guidance comes from</h2>
+        <p>We prioritize current federal and Florida government sources. Rules and plan availability can change; use the official application for a final eligibility decision.</p>
+        <ul class="source-list">{page.sources.map((source) => <li><a href={source.url} rel="external">{source.label}</a></li>)}</ul>
+        <p class="source-list">Reviewed September 9, 2026.</p>
+      </section>
+    </div>
+  </article>
+  <section class="section tint"><div class="container cta-panel"><div><h2>Turn the deadline into a clear next step.</h2><p>Start with your date and ZIP. We will ask for contact details only after the coverage questions.</p></div><button class="button" type="button" data-funnel-open data-analytics="bottom_cta">{page.cta}</button>
+  </div></section>
+</SiteLayout>

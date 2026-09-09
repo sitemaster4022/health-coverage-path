@@ -1,0 +1,9 @@
+---
+import GuidePage from '../../components/GuidePage.astro';
+import { floridaPages, type GuidePage as Guide } from '../../data/floridaPages';
+export const prerender = true;
+export function getStaticPaths() { return floridaPages.map((page) => ({ params: { slug: page.slug }, props: { page } })); }
+interface Props { page: Guide }
+const { page } = Astro.props;
+---
+<GuidePage page={page} />
