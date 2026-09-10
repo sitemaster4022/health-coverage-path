@@ -5,7 +5,7 @@ import type { NormalizedLead } from '../../lib/lead-routing';
 
 export const prerender = false;
 
-const allowedEvents = new Set(['page_view','page_cta_click','funnel_start','funnel_step_complete','funnel_abandon','lead_submit','lead_success','lead_failure','calculator_complete']);
+const allowedEvents = new Set(['page_view','page_cta_click','funnel_start','funnel_step_complete','funnel_abandon','lead_submit','lead_success','lead_duplicate','lead_failure','calculator_complete']);
 const attributionKeys = ['utmSource','utmMedium','utmCampaign','utmTerm','utmContent','gclid','fbclid','msclkid','ttclid'] as const;
 const clean = (value: unknown, max = 200) => typeof value === 'string' ? value.trim().slice(0, max) : '';
 const nullable = (value: unknown, max = 200) => clean(value, max) || null;
