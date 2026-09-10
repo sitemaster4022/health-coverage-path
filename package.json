@@ -3,7 +3,9 @@
   "description": "Florida-first health coverage guidance and qualification funnel.",
   "type": "module",
   "private": true,
-  "engines": { "node": ">=22" },
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "astro": "astro",
     "dev": "astro dev",
@@ -22,6 +24,7 @@
     "typescript": "5.9.3"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260910.1",
     "wrangler": "4.127.0"
   }
 }

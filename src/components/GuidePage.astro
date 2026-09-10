@@ -1,11 +1,11 @@
 ---
 import SiteLayout from '../layouts/SiteLayout.astro';
-import type { GuidePage as Guide } from '../data/floridaPages';
+import { floridaPages, type GuidePage as Guide } from '../data/floridaPages';
 interface Props { page: Guide }
 const { page } = Astro.props;
 const canonical = `https://healthcoveragepath.com/florida/${page.slug}/`;
 const schema = [
-  { '@context': 'https://schema.org', '@type': 'Article', headline: page.title, description: page.description, mainEntityOfPage: canonical, author: { '@type': 'Organization', name: 'HealthCoveragePath' }, publisher: { '@type': 'Organization', name: 'HealthCoveragePath', url: 'https://healthcoveragepath.com/' }, dateModified: '2026-09-09' },
+  { '@context': 'https://schema.org', '@type': 'Article', headline: page.title, description: page.description, mainEntityOfPage: canonical, author: { '@type': 'Organization', name: 'HealthCoveragePath' }, publisher: { '@type': 'Organization', name: 'HealthCoveragePath', url: 'https://healthcoveragepath.com/' }, dateModified: '2026-09-10' },
   { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: page.faqs.map((faq) => ({ '@type': 'Question', name: faq.question, acceptedAnswer: { '@type': 'Answer', text: faq.answer } })) },
   { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
     { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://healthcoveragepath.com/' },
@@ -13,6 +13,17 @@ const schema = [
     { '@type': 'ListItem', position: 3, name: page.title, item: canonical }
   ] }
 ];
+const relatedBySlug: Record<string, string[]> = {
+  'health-insurance-after-losing-job': ['cobra-alternatives', 'special-enrollment-period', 'health-insurance-without-a-job'],
+  'losing-medicaid': ['special-enrollment-period', 'health-insurance-without-a-job', 'health-insurance-after-losing-job'],
+  'turning-26': ['special-enrollment-period', 'health-insurance-without-a-job', 'cobra-alternatives'],
+  'cobra-alternatives': ['health-insurance-after-losing-job', 'special-enrollment-period', 'health-insurance-without-a-job'],
+  'self-employed': ['1099-health-insurance', 'health-insurance-without-a-job', 'special-enrollment-period'],
+  '1099-health-insurance': ['self-employed', 'special-enrollment-period', 'health-insurance-without-a-job'],
+  'special-enrollment-period': ['health-insurance-after-losing-job', 'losing-medicaid', 'turning-26'],
+  'health-insurance-without-a-job': ['health-insurance-after-losing-job', 'cobra-alternatives', 'self-employed'],
+};
+const relatedPages = (relatedBySlug[page.slug] ?? []).map((slug) => floridaPages.find((candidate) => candidate.slug === slug)).filter((candidate): candidate is Guide => Boolean(candidate));
 ---
 <SiteLayout title={page.metaTitle} description={page.description} schema={schema} funnelContext={page.context}>
   <section class="hero">
@@ -69,10 +80,16 @@ const schema = [
         <p class="eyebrow">Primary sources</p><h2>Where this guidance comes from</h2>
         <p>We prioritize current federal and Florida government sources. Rules and plan availability can change; use the official application for a final eligibility decision.</p>
         <ul class="source-list">{page.sources.map((source) => <li><a href={source.url} rel="external">{source.label}</a></li>)}</ul>
-        <p class="source-list">Reviewed September 9, 2026.</p>
+        <p class="source-list">Updated September 10, 2026.</p>
       </section>
+      <nav class="content-section related-guides" aria-labelledby="related-guides-title">
+        <p class="eyebrow">Keep comparing</p><h2 id="related-guides-title">Related Florida Guides</h2>
+        <div class="related-guide-grid">
+          {relatedPages.map((related) => <a href={`/florida/${related.slug}/`}><strong>{related.title}</strong><span>{related.cardSummary}</span></a>)}
+        </div>
+      </nav>
     </div>
   </article>
-  <section class="section tint"><div class="container cta-panel"><div><h2>Turn the deadline into a clear next step.</h2><p>Start with your date and ZIP. We will ask for contact details only after the coverage questions.</p></div><button class="button" type="button" data-funnel-open data-analytics="bottom_cta">{page.cta}</button>
+  <section class="section tint"><div class="container cta-panel"><div><h2>Turn the deadline into a clear next step.</h2><p>Start with your timing and ZIP. We will ask for contact details only after the coverage questions.</p></div><button class="button" type="button" data-funnel-open data-analytics="bottom_cta">{page.cta}</button>
   </div></section>
 </SiteLayout>

@@ -3,11 +3,15 @@ export type RoutingStatus = 'held' | 'delivered' | 'rejected' | 'failed';
 export interface NormalizedLead {
   id: string;
   submittedAt: string;
-  landingPage: string;
+  originalLandingUrl: string;
+  originalLandingPath: string;
+  submissionPath: string;
   referrer: string | null;
   context: string;
-  coverageDate: string;
+  timingBucket: string;
+  coverageDate: string | null;
   zip: string;
+  county: string | null;
   coverageFor: string;
   householdSize: number;
   incomeRange: string;
@@ -21,6 +25,24 @@ export interface NormalizedLead {
   consentVersion: string;
   userAgent: string | null;
   ipAddress: string | null;
+  attribution: {
+    utmSource: string | null;
+    utmMedium: string | null;
+    utmCampaign: string | null;
+    utmTerm: string | null;
+    utmContent: string | null;
+    gclid: string | null;
+    fbclid: string | null;
+    msclkid: string | null;
+    ttclid: string | null;
+  };
+  optionalBuyerFields: {
+    dateOfBirth: null;
+    gender: null;
+    tobaccoUse: null;
+    householdAges: null;
+  };
+  isTest: boolean;
 }
 
 export interface RoutingResult {
@@ -34,11 +56,14 @@ interface RouterEnv { LEAD_ROUTER_URL?: string; LEAD_ROUTER_TOKEN?: string }
 
 /**
  * Buyer-neutral routing seam. Until an approved buyer is configured, valid
- * submissions are held and recorded in structured Worker logs. A future buyer
+ * submissions are held in durable storage. A future buyer
  * adapter can implement ping/post, field mapping, price floors and returns here
  * without changing the public funnel.
  */
 export async function routeLead(lead: NormalizedLead, env: RouterEnv): Promise<RoutingResult> {
+  if (lead.isTest) {
+    return { status: 'held', buyerId: null, externalId: null, detail: 'Test submission; buyer delivery skipped' };
+  }
   if (!env.LEAD_ROUTER_URL) {
     return { status: 'held', buyerId: null, externalId: null, detail: 'No approved buyer router configured' };
   }
