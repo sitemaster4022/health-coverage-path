@@ -22,6 +22,9 @@ export const onRequest = defineMiddleware(async ({ url }, next) => {
   headers.set('x-content-type-options', 'nosniff');
   headers.set('x-frame-options', 'DENY');
   headers.set('strict-transport-security', 'max-age=31536000; includeSubDomains');
+  if (/^\/sitemap(?:-index|-\d+)\.xml$/.test(url.pathname)) {
+    headers.set('content-type', 'application/xml; charset=utf-8');
+  }
   if (url.pathname.startsWith('/api/')) {
     headers.set('cache-control', 'no-store, max-age=0');
     headers.set('pragma', 'no-cache');
