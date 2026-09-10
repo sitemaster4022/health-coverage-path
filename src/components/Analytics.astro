@@ -1,0 +1,67 @@
+<script>
+  type Attribution = {
+    id: string;
+    capturedAt: number;
+    originalLandingUrl: string;
+    originalLandingPath: string;
+    referrer: string | null;
+    attribution: Record<string, string | null>;
+  };
+  declare global {
+    interface Window { hcpGetAttribution?: () => Attribution }
+  }
+
+  const storageKey = 'hcp:first-touch:v1';
+  const sessionKey = 'hcp:session:v1';
+  const maxAge = 90 * 24 * 60 * 60 * 1000;
+  const allowed: Record<string, string> = {
+    utm_source:'utmSource', utm_medium:'utmMedium', utm_campaign:'utmCampaign',
+    utm_term:'utmTerm', utm_content:'utmContent', gclid:'gclid', fbclid:'fbclid',
+    msclkid:'msclkid', ttclid:'ttclid',
+  };
+  const clean = (value: string | null, max = 300) => value?.trim().slice(0, max) || null;
+
+  const capture = (): Attribution => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(storageKey) || 'null') as Attribution | null;
+      if (saved?.id && Date.now() - saved.capturedAt < maxAge && saved.originalLandingPath?.startsWith('/')) return saved;
+    } catch { /* Replace malformed or expired local state. */ }
+    const params = new URLSearchParams(location.search);
+    const attribution: Record<string, string | null> = {};
+    const safeQuery = new URLSearchParams();
+    for (const [queryName, fieldName] of Object.entries(allowed)) {
+      const value = clean(params.get(queryName), queryName.startsWith('utm_') ? 160 : 300);
+      attribution[fieldName] = value;
+      if (value) safeQuery.set(queryName, value);
+    }
+    const firstTouch: Attribution = {
+      id: crypto.randomUUID(), capturedAt: Date.now(), originalLandingPath: location.pathname,
+      originalLandingUrl: `${location.pathname}${safeQuery.size ? `?${safeQuery}` : ''}`,
+      referrer: clean(document.referrer, 500), attribution,
+    };
+    try { localStorage.setItem(storageKey, JSON.stringify(firstTouch)); } catch { /* Attribution still works for this page. */ }
+    return firstTouch;
+  };
+
+  const firstTouch = capture();
+  let sessionId = '';
+  try {
+    sessionId = sessionStorage.getItem(sessionKey) || crypto.randomUUID();
+    sessionStorage.setItem(sessionKey, sessionId);
+  } catch { sessionId = crypto.randomUUID(); }
+  window.hcpGetAttribution = () => firstTouch;
+
+  const collect = (detail: Record<string, unknown>) => {
+    const payload = {
+      ...detail, session_id: sessionId, first_touch_id: firstTouch.id,
+      original_landing_url: firstTouch.originalLandingUrl, original_landing_path: firstTouch.originalLandingPath,
+      current_path: location.pathname, referrer: firstTouch.referrer, attribution: firstTouch.attribution,
+    };
+    const body = JSON.stringify(payload);
+    if (!navigator.sendBeacon?.('/api/analytics', new Blob([body], { type:'application/json' }))) {
+      fetch('/api/analytics', { method:'POST', headers:{ 'content-type':'application/json' }, body, keepalive:true }).catch(() => undefined);
+    }
+  };
+  window.addEventListener('hcp:analytics', (event) => collect((event as CustomEvent<Record<string, unknown>>).detail || {}));
+  collect({ event:'page_view', funnel_context:document.body.dataset.funnelContext || 'general' });
+</script>
