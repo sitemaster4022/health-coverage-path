@@ -1,4 +1,4 @@
-import type { D1Database } from '@cloudflare/workers-types';
+import type { D1Database } from './d1-types';
 import type { NormalizedLead, RoutingResult } from './lead-routing';
 
 export interface AnalyticsEvent {

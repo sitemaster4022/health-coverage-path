@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import type { D1Database } from '@cloudflare/workers-types';
+import type { D1Database } from '../../lib/d1-types';
 import { claimRequestQuota, saveAnalyticsEvent } from '../../lib/lead-storage';
 import type { NormalizedLead } from '../../lib/lead-routing';
 
