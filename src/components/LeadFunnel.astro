@@ -234,10 +234,11 @@ const { context = 'general' } = Astro.props;
     try {
       track('lead_submit', { step_number:flow.length, step_name:active?.dataset.stepName, total_steps:flow.length });
       const response = await fetch('/api/leads', { method:'POST', headers:{ 'content-type':'application/json' }, body:JSON.stringify(payload) });
-      const result = await response.json() as { id?:string; status?:string; error?:string };
+      const result = await response.json() as { id?:string; status?:string; duplicate?:boolean; error?:string };
       if (!response.ok) throw new Error(result.error || 'submit_failed');
       completed = true; track('funnel_step_complete', { step_number:flow.length, step_name:active?.dataset.stepName, total_steps:flow.length });
-      track('lead_success', { lead_id:result.id, routing_status:result.status });
+      if (result.duplicate) track('lead_duplicate', { routing_status:result.status });
+      else track('lead_success', { lead_id:result.id, routing_status:result.status });
       flow = [...flow,9]; show(flow.length - 1); form.reset();
       form.querySelectorAll('.choice.selected').forEach((choice) => choice.classList.remove('selected'));
     } catch {
