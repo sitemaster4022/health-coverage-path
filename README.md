@@ -62,6 +62,12 @@ TrustedForm Certify is an optional supplemental evidence layer documented in
 [docs/trustedform-certify.md](docs/trustedform-certify.md). It stores only the
 validated certificate URL and keeps buyer delivery disabled by default.
 
+## Analytics documentation
+
+GA4 is a secondary, page-only analytics layer documented in
+[docs/ga4-analytics.md](docs/ga4-analytics.md). Detailed funnel behavior,
+attribution, consent and lead records remain first-party D1 data.
+
 ## 👀 Want to learn more?
 
 Check out [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).

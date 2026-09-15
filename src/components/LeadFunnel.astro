@@ -158,7 +158,7 @@ const { context = 'general' } = Astro.props;
     const payload = { event, landing_page: location.pathname, funnel_context: currentContext(), ...detail };
     window.dispatchEvent(new CustomEvent('hcp:analytics', { detail: payload }));
     const w = window as typeof window & { dataLayer?: Record<string, unknown>[]; plausible?: (e: string, o: unknown) => void };
-    w.dataLayer?.push(payload); w.plausible?.(event, { props: payload });
+    w.hcpDataLayer?.push(payload); w.plausible?.(event, { props: payload });
   };
 
   const renderTiming = (context: string) => {
