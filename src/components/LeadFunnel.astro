@@ -96,7 +96,6 @@ const { context = 'general' } = Astro.props;
 
       <section class="funnel-step" data-step="9" data-step-name="success" aria-live="polite">
         <div class="success-mark" aria-hidden="true">✓</div><h2>Thanks—your coverage request is in.</h2><p>We saved the details you provided. If your request can be matched, a licensed insurance professional or approved coverage partner may contact you about available options.</p><p class="muted">Submitting this form does not enroll you in a plan. For immediate official Marketplace help, visit <a href="https://www.healthcare.gov/">HealthCare.gov</a>.</p>
-        <p class="muted" id="trustedform-test-status" hidden aria-live="polite"></p>
       </section>
       <div class="funnel-error" id="funnel-error" role="alert"></div>
       <div class="funnel-actions"><button class="button secondary small" type="button" name="back" data-back hidden>Back</button><button class="button" type="submit" name="lead_submit" data-next data-tf-element-role="submit"><span data-tf-element-role="submit-text">Continue</span></button></div>
@@ -137,8 +136,6 @@ const { context = 'general' } = Astro.props;
   let startedAt = 0;
   let completed = false;
   let previousFocus: HTMLElement | null = null;
-  const trustedFormProductionTest = location.hostname === 'healthcoveragepath.com' && new URLSearchParams(location.search).get('trustedform_test') === '1';
-  const trustedFormTestStatus = document.querySelector<HTMLElement>('#trustedform-test-status');
 
   const timingSets: Record<string, { title:string; help:string; options:[string,string][] }> = {
     job_loss:{ title:'When did your employer coverage end—or when will it end?', help:'A general range is enough. Timing helps identify possible enrollment windows.', options:[['already_ended','Coverage already ended'],['next_30','Ends within the next 30 days'],['days_31_60','Ends in 31–60 days'],['over_60_future','Ends more than 60 days from now'],['over_60_past','Ended more than 60 days ago'],['unsure','I’m not sure']] },
@@ -213,7 +210,6 @@ const { context = 'general' } = Astro.props;
     flow = initialContext === 'general' ? [1,...directFlow] : directFlow; flowIndex = 0;
     if (contextInput) contextInput.value = initialContext;
     if (next) next.disabled = false;
-    if (trustedFormTestStatus) { trustedFormTestStatus.hidden = true; trustedFormTestStatus.textContent = ''; }
     renderTiming(initialContext);
     modal.hidden = false; modal.classList.add('open'); document.body.classList.add('funnel-open'); show(0);
     track('funnel_start', { cta: trigger.dataset.analytics ?? 'content_cta', total_steps:flow.length });
@@ -261,22 +257,15 @@ const { context = 'general' } = Astro.props;
     const payload = { ...data, originalLandingUrl:firstTouch?.originalLandingUrl || location.pathname,
       originalLandingPath:firstTouch?.originalLandingPath || location.pathname, submissionPath:location.pathname,
       referrer:firstTouch?.referrer || document.referrer || null, attribution:firstTouch?.attribution || {},
-      startedAt, completedAt:Date.now(), ...(trustedFormProductionTest ? { testSubmission:true } : {}) };
+
     try {
       track('lead_submit', { step_number:flow.length, step_name:active?.dataset.stepName, total_steps:flow.length });
       const response = await fetch('/api/leads', { method:'POST', headers:{ 'content-type':'application/json' }, body:JSON.stringify(payload) });
-      const result = await response.json() as { id?:string; status?:string; duplicate?:boolean; error?:string; testVerification?: { certificatePersisted?:boolean; trustedFormStatus?:string|null; routingStatus?:string|null; buyerDelivery?:string } };
+      const result = await response.json() as { id?:string; status?:string; duplicate?:boolean; error?:string };
       if (!response.ok) throw new Error(result.error || 'submit_failed');
       completed = true; track('funnel_step_complete', { step_number:flow.length, step_name:active?.dataset.stepName, total_steps:flow.length });
       if (result.duplicate) track('lead_duplicate', { routing_status:result.status });
       else track('lead_success', { lead_id:result.id, routing_status:result.status });
-      if (trustedFormProductionTest && trustedFormTestStatus) {
-        const verification = result.testVerification;
-        trustedFormTestStatus.hidden = false;
-        trustedFormTestStatus.textContent = verification
-          ? `TrustedForm test: certificate ${verification.certificatePersisted ? 'persisted' : 'missing'}; evidence status ${verification.trustedFormStatus || 'unknown'}; routing ${verification.routingStatus || result.status || 'unknown'}; buyer delivery ${verification.buyerDelivery || 'unknown'}.`
-          : 'TrustedForm test: verification unavailable.';
-      }
       flow = [...flow,9]; show(flow.length - 1); form.reset();
       form.querySelectorAll('.choice.selected').forEach((choice) => choice.classList.remove('selected'));
     } catch {
