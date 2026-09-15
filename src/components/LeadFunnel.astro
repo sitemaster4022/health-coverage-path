@@ -233,7 +233,7 @@ const { context = 'general' } = Astro.props;
   back?.addEventListener('click', () => show(Math.max(0, flowIndex - 1)));
   form?.addEventListener('submit', async (event) => {
     event.preventDefault();
-    if (!form || !valid()) return;
+    if (!form || !next || !valid()) return;
     const active = activeStep();
     if (flow[flowIndex] === 1) {
       const selected = (form.elements.namedItem('situation') as RadioNodeList)?.value;
