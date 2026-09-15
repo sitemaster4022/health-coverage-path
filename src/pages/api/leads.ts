@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import type { D1Database, TrustedFormStatus } from '../../lib/d1-types';
+import type { D1Database } from '../../lib/d1-types';
 import { CONSENT_TEXT, CONSENT_VERSION } from '../../consts';
 import { claimLeadFingerprint, claimRequestQuota, releaseLeadFingerprint, saveLead, saveRoutingResult } from '../../lib/lead-storage';
 import { routeLead, type NormalizedLead } from '../../lib/lead-routing';
@@ -24,17 +24,6 @@ const clean = (value: unknown, max = 200) => typeof value === 'string' ? value.t
 const nullable = (value: unknown, max = 200) => clean(value, max) || null;
 const digits = (value: unknown) => clean(value, 30).replace(/\D/g, '');
 const validDate = (value: string) => !value || (/^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(Date.parse(`${value}T00:00:00Z`)));
-const normalizeTrustedFormCertificateUrl = (value: unknown) => {
-  const candidate = nullable(value, 500);
-  if (!candidate || /[\r\n]/.test(candidate)) return null;
-  try {
-    const parsed = new URL(candidate);
-    if (parsed.protocol !== 'https:' || parsed.hostname !== 'cert.trustedform.com' || parsed.pathname === '/' || parsed.search || parsed.hash) return null;
-    return candidate;
-  } catch {
-    return null;
-  }
-};
 const validPath = (value: string) => value.startsWith('/') && !value.startsWith('//') && !/[\r\n]/.test(value);
 
 async function fingerprint(value: string) {
@@ -69,8 +58,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
   const submissionPath = clean(raw.submissionPath, 300);
   const referrer = nullable(raw.referrer, 500);
   const consentVersion = clean(raw.consentVersion, 80);
-  const trustedFormCertificateUrl = normalizeTrustedFormCertificateUrl(raw.xxTrustedFormCertUrl);
-  const trustedFormStatus: TrustedFormStatus = trustedFormCertificateUrl ? 'available' : 'missing';
   const consent = raw.consent === 'yes';
   const incomingAttribution = raw.attribution && typeof raw.attribution === 'object' ? raw.attribution as Record<string, unknown> : {};
   const attribution = Object.fromEntries(attributionKeys.map((key) => [key, nullable(incomingAttribution[key], key.startsWith('utm') ? 160 : 300)])) as NormalizedLead['attribution'];
@@ -86,7 +73,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     !validPath(originalLandingPath) || !validPath(submissionPath) || !consent || consentVersion !== CONSENT_VERSION;
   if (invalid) return json({ ok: false, error: 'Please review the form fields and try again.' }, 422);
 
-  const env = (locals.runtime?.env || {}) as { DB?: D1Database; LEAD_ROUTER_URL?: string; LEAD_ROUTER_TOKEN?: string; BUYER_DELIVERY_ENABLED?: string; TEST_SUBMISSION_TOKEN?: string };
+  const env = (locals.runtime?.env || {}) as { DB?: D1Database; LEAD_ROUTER_URL?: string; LEAD_ROUTER_TOKEN?: string; TEST_SUBMISSION_TOKEN?: string };
   if (!env.DB) return json({ ok: false, error: 'Secure lead storage is temporarily unavailable. Please try again later.' }, 503);
 
   const requestIp = request.headers.get('cf-connecting-ip') || request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || null;
@@ -97,9 +84,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     if (!(await claimRequestQuota(env.DB, rateKey, (bucket + 1) * windowMs, 8))) return json({ ok: false, error: 'Too many requests. Please try again later.' }, 429);
   }
 
-  const tokenTest = Boolean(env.TEST_SUBMISSION_TOKEN && raw.testSubmission === true && request.headers.get('x-hcp-test-token') === env.TEST_SUBMISSION_TOKEN);
-  const productionQueryTest = raw.testSubmission === true && request.headers.get('origin') === 'https://healthcoveragepath.com';
-  const isTest = tokenTest || productionQueryTest;
+  const isTest = Boolean(env.TEST_SUBMISSION_TOKEN && raw.testSubmission === true && request.headers.get('x-hcp-test-token') === env.TEST_SUBMISSION_TOKEN);
   const duplicateKey = await fingerprint(`${email}|${phone}|${zip}`);
   const now = Date.now();
   if (!(await claimLeadFingerprint(env.DB, duplicateKey, now))) return json({ ok: true, duplicate: true, status: 'held' }, 202);
@@ -108,8 +93,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     id: crypto.randomUUID(), submittedAt: new Date(now).toISOString(), originalLandingUrl, originalLandingPath,
     submissionPath, referrer, context, timingBucket, coverageDate: coverageDate || null, zip, county: null,
     coverageFor, householdSize, incomeRange, coverageStatus, firstName, lastName, email, phone, consent: true,
-    consentText: CONSENT_TEXT, consentVersion, trustedFormCertificateUrl, trustedFormStatus,
-    userAgent: request.headers.get('user-agent'),
+    consentText: CONSENT_TEXT, consentVersion, userAgent: request.headers.get('user-agent'),
     ipAddress: requestIp,
     attribution, optionalBuyerFields: { dateOfBirth: null, gender: null, tobaccoUse: null, householdAges: null }, isTest,
   };
@@ -124,23 +108,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
   const routing = await routeLead(lead, env);
   try { await saveRoutingResult(env.DB, lead.id, routing); }
   catch (cause) { console.error(JSON.stringify({ event: 'routing_audit_failed', leadId: lead.id, status: routing.status, error: cause instanceof Error ? cause.name : 'unknown' })); }
-  let testVerification: { certificatePersisted:boolean; trustedFormStatus:string|null; routingStatus:string|null; buyerDelivery:'disabled' } | undefined;
-  if (isTest) {
-    try {
-      const persisted = await env.DB.prepare('SELECT trustedform_cert_url, trustedform_status, routing_status FROM leads WHERE id = ?').bind(lead.id).first<{ trustedform_cert_url:string|null; trustedform_status:string|null; routing_status:string|null }>();
-      testVerification = {
-        certificatePersisted: Boolean(persisted?.trustedform_cert_url && persisted.trustedform_status === 'available'),
-        trustedFormStatus: persisted?.trustedform_status ?? null,
-        routingStatus: persisted?.routing_status ?? routing.status,
-        buyerDelivery: 'disabled',
-      };
-    } catch (cause) {
-      console.error(JSON.stringify({ event:'trustedform_test_readback_failed', leadId:lead.id, error:cause instanceof Error ? cause.name : 'unknown' }));
-      testVerification = { certificatePersisted:false, trustedFormStatus:null, routingStatus:routing.status, buyerDelivery:'disabled' };
-    }
-  }
   console.log(JSON.stringify({ event: 'lead_submission', leadId: lead.id, context: lead.context, routingStatus: routing.status, isTest }));
-  return json({ ok: true, id: lead.id, status: routing.status, ...(testVerification ? { testVerification } : {}) }, routing.status === 'delivered' ? 200 : 202);
+  return json({ ok: true, id: lead.id, status: routing.status }, routing.status === 'delivered' ? 200 : 202);
 };
 
 export const ALL: APIRoute = () => json({ ok: false, error: 'Method not allowed' }, 405);

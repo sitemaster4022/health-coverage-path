@@ -55,13 +55,6 @@ All commands are run from the root of the project, from a terminal:
 | `npm run build && npm run deploy` | Deploy your production site to Cloudflare        |
 | `npm wrangler tail`               | View real-time logs for all Workers              |
 
-## Lead pipeline documentation
-
-The progressive lead form stores first-party consent and lead records in D1.
-TrustedForm Certify is an optional supplemental evidence layer documented in
-[docs/trustedform-certify.md](docs/trustedform-certify.md). It stores only the
-validated certificate URL and keeps buyer delivery disabled by default.
-
 ## 👀 Want to learn more?
 
 Check out [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).

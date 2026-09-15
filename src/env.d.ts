@@ -4,7 +4,6 @@ interface Env {
   DB?: import('./lib/d1-types').D1Database;
   LEAD_ROUTER_URL?: string;
   LEAD_ROUTER_TOKEN?: string;
-  BUYER_DELIVERY_ENABLED?: string;
   TEST_SUBMISSION_TOKEN?: string;
 }
 

@@ -1,5 +1,3 @@
-import type { TrustedFormStatus } from './d1-types';
-
 export type RoutingStatus = 'held' | 'delivered' | 'rejected' | 'failed';
 
 export interface NormalizedLead {
@@ -25,8 +23,6 @@ export interface NormalizedLead {
   consent: true;
   consentText: string;
   consentVersion: string;
-  trustedFormCertificateUrl: string | null;
-  trustedFormStatus: TrustedFormStatus;
   userAgent: string | null;
   ipAddress: string | null;
   attribution: {
@@ -56,7 +52,7 @@ export interface RoutingResult {
   detail?: string;
 }
 
-interface RouterEnv { LEAD_ROUTER_URL?: string; LEAD_ROUTER_TOKEN?: string; BUYER_DELIVERY_ENABLED?: string }
+interface RouterEnv { LEAD_ROUTER_URL?: string; LEAD_ROUTER_TOKEN?: string }
 
 /**
  * Buyer-neutral routing seam. Until an approved buyer is configured, valid
@@ -68,11 +64,8 @@ export async function routeLead(lead: NormalizedLead, env: RouterEnv): Promise<R
   if (lead.isTest) {
     return { status: 'held', buyerId: null, externalId: null, detail: 'Test submission; buyer delivery skipped' };
   }
-  if (env.BUYER_DELIVERY_ENABLED !== 'true' || !env.LEAD_ROUTER_URL) {
-    return {
-      status: 'held', buyerId: null, externalId: null,
-      detail: env.LEAD_ROUTER_URL ? 'Buyer delivery disabled' : 'No approved buyer router configured',
-    };
+  if (!env.LEAD_ROUTER_URL) {
+    return { status: 'held', buyerId: null, externalId: null, detail: 'No approved buyer router configured' };
   }
 
   try {
