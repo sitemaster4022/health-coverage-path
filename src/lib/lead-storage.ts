@@ -54,16 +54,15 @@ export async function saveLead(db: D1Database, lead: NormalizedLead) {
       id, submitted_at, original_landing_url, original_landing_path, submission_path, referrer,
       funnel_context, timing_bucket, coverage_date, zip, county, coverage_for, household_size,
       income_range, coverage_status, first_name, last_name, email, phone, consent, consent_text,
-      consent_version, trustedform_cert_url, trustedform_status, user_agent, ip_address,
-      utm_source, utm_medium, utm_campaign, utm_term, utm_content, gclid, fbclid, msclkid, ttclid,
-      routing_status, is_test
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)`)
+      consent_version, user_agent, ip_address, utm_source, utm_medium, utm_campaign, utm_term,
+      utm_content, gclid, fbclid, msclkid, ttclid, routing_status, is_test
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)`)
       .bind(lead.id, lead.submittedAt, lead.originalLandingUrl, lead.originalLandingPath,
         lead.submissionPath, lead.referrer, lead.context, lead.timingBucket, lead.coverageDate,
         lead.zip, lead.county, lead.coverageFor, lead.householdSize, lead.incomeRange,
         lead.coverageStatus, lead.firstName, lead.lastName, lead.email, lead.phone,
-        lead.consentText, lead.consentVersion, lead.trustedFormCertificateUrl, lead.trustedFormStatus,
-        lead.userAgent, lead.ipAddress, a.utmSource, a.utmMedium, a.utmCampaign, a.utmTerm, a.utmContent,
+        lead.consentText, lead.consentVersion, lead.userAgent, lead.ipAddress,
+        a.utmSource, a.utmMedium, a.utmCampaign, a.utmTerm, a.utmContent,
         a.gclid, a.fbclid, a.msclkid, a.ttclid, lead.isTest ? 1 : 0),
     db.prepare(`INSERT INTO consent_records
       (lead_id, consented_at, consent_text, consent_version, ip_address, user_agent)
