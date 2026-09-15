@@ -104,14 +104,16 @@ const { context = 'general' } = Astro.props;
 </div>
 <div class="mobile-cta"><button class="button" type="button" data-funnel-open data-analytics="mobile_sticky_cta">Check My Options</button></div>
 
-<script is:inline>
+<script is:inline type="text/javascript">
   (() => {
-    const field = "xxTrustedFormCertUrl";
-    const tf = document.createElement("script");
-    tf.type = "text/javascript";
+    const tf = document.createElement('script');
+    tf.type = 'text/javascript';
     tf.async = true;
-    tf.src = `https://api.trustedform.com/trustedform.js?field=${encodeURIComponent(field)}&use_tagged_consent=true`;
-    document.body.appendChild(tf);
+    tf.src = (document.location.protocol === 'https:' ? 'https' : 'http') +
+      '://api.trustedform.com/trustedform.js?field=xxTrustedFormCertUrl&use_tagged_consent=true&l=' +
+      new Date().getTime() + Math.random();
+    const firstScript = document.getElementsByTagName('script')[0];
+    firstScript?.parentNode?.insertBefore(tf, firstScript);
   })();
 </script>
 <noscript><img src="https://api.trustedform.com/ns.gif" alt="" /></noscript>

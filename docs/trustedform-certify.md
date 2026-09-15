@@ -37,8 +37,9 @@ already present:
 https://api.trustedform.com/trustedform.js
 ~~~
 
-The loader configures the documented `field=xxTrustedFormCertUrl` parameter and
-`use_tagged_consent=true` for the current consent-tag implementation. The SDK
+The loader matches the account-provided `field=xxTrustedFormCertUrl` and
+`use_tagged_consent=true` settings and includes the account snippet's cache-busting
+`l=` parameter. The SDK
 may also create its documented token and ping helper fields. We intentionally
 remove those helper fields before posting to our API because the current
 buyer-neutral system needs only the certificate URL and does not call Retain,
