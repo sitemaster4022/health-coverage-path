@@ -3,12 +3,12 @@ import { defineMiddleware } from 'astro:middleware';
 const contentSecurityPolicy = [
   "default-src 'self'",
   "base-uri 'self'",
-  "connect-src 'self'",
+  "connect-src 'self' https://api.trustedform.com",
   "form-action 'self'",
   "frame-ancestors 'none'",
-  "img-src 'self' data:",
+  "img-src 'self' data: https://api.trustedform.com",
   "object-src 'none'",
-  "script-src 'self' 'unsafe-inline'",
+  "script-src 'self' 'unsafe-inline' https://api.trustedform.com",
   "style-src 'self' 'unsafe-inline'",
   "upgrade-insecure-requests",
 ].join('; ');
