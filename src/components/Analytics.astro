@@ -8,7 +8,7 @@
     attribution: Record<string, string | null>;
   };
   declare global {
-    interface Window { hcpGetAttribution?: () => Attribution }
+    interface Window { hcpGetAttribution?: () => Attribution; hcpDataLayer?: Record<string, unknown>[] }
   }
 
   const storageKey = 'hcp:first-touch:v1';

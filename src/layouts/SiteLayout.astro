@@ -29,6 +29,29 @@ const schemas = Array.isArray(schema) ? schema : schema ? [schema] : [];
     {noindex && <meta name="robots" content="noindex,follow" />}
     <link rel="canonical" href={canonical} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+    <!-- Google tag (gtag.js): page-only, query-string-sanitized GA4 measurement. -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-9DNQ8RYLN2"></script>
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){window.dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      const gaPageReferrer = (() => {
+        try {
+          return document.referrer ? new URL(document.referrer).origin : '';
+        } catch {
+          return '';
+        }
+      })();
+      gtag('config', 'G-9DNQ8RYLN2', {
+        send_page_view: true,
+        page_location: window.location.origin + window.location.pathname,
+        page_referrer: gaPageReferrer,
+        allow_google_signals: false,
+        allow_ad_personalization_signals: false
+      });
+    </script>
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={SITE_TITLE} />
     <meta property="og:title" content={fullTitle} />
