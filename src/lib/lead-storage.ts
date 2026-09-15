@@ -57,7 +57,7 @@ export async function saveLead(db: D1Database, lead: NormalizedLead) {
       consent_version, trustedform_cert_url, trustedform_status, user_agent, ip_address,
       utm_source, utm_medium, utm_campaign, utm_term, utm_content, gclid, fbclid, msclkid, ttclid,
       routing_status, is_test
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)`)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)`)
       .bind(lead.id, lead.submittedAt, lead.originalLandingUrl, lead.originalLandingPath,
         lead.submissionPath, lead.referrer, lead.context, lead.timingBucket, lead.coverageDate,
         lead.zip, lead.county, lead.coverageFor, lead.householdSize, lead.incomeRange,
