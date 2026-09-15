@@ -6,10 +6,10 @@ const { context = 'general' } = Astro.props;
 <div class="funnel-backdrop" id="lead-funnel" role="dialog" aria-modal="true" aria-label="Check your coverage path" data-context={context} hidden>
   <div class="funnel">
     <div class="funnel-top">
-      <div class="funnel-topline"><strong>Check your coverage path</strong><button class="funnel-close" type="button" aria-label="Close">×</button></div>
+      <div class="funnel-topline"><strong>Check your coverage path</strong><button class="funnel-close" type="button" name="close" aria-label="Close">×</button></div>
       <div class="progress-track" role="progressbar" aria-label="Form progress" aria-valuemin="1" aria-valuemax="8" aria-valuenow="1"><div class="progress-bar"></div></div>
     </div>
-    <form class="funnel-body" id="lead-form" novalidate>
+    <form class="funnel-body" id="lead-form" data-tf-element-role="offer" novalidate>
       <input class="honeypot" type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true" />
       <input type="hidden" name="context" value={context} />
       <input type="hidden" name="consentVersion" value={CONSENT_VERSION} />
@@ -18,13 +18,13 @@ const { context = 'general' } = Astro.props;
         <p class="eyebrow">First, what changed</p>
         <h2 id="funnel-title">What changed with your coverage?</h2>
         <div class="choice-grid">
-          <label class="choice"><input type="radio" name="situation" value="job_loss" required /> Lost job-based coverage</label>
-          <label class="choice"><input type="radio" name="situation" value="medicaid_loss" /> Losing or lost Medicaid</label>
-          <label class="choice"><input type="radio" name="situation" value="turning_26" /> Turning 26 / aging off a parent’s plan</label>
-          <label class="choice"><input type="radio" name="situation" value="self_employed" /> Self-employed / 1099 / between jobs</label>
-          <label class="choice"><input type="radio" name="situation" value="cobra" /> COBRA decision</label>
-          <label class="choice"><input type="radio" name="situation" value="other" /> Other life change</label>
-          <label class="choice"><input type="radio" name="situation" value="not_sure" /> I’m not sure</label>
+          <label class="choice"><input id="situation-job_loss" type="radio" name="situation" value="job_loss" required /> Lost job-based coverage</label>
+          <label class="choice"><input id="situation-medicaid_loss" type="radio" name="situation" value="medicaid_loss" /> Losing or lost Medicaid</label>
+          <label class="choice"><input id="situation-turning_26" type="radio" name="situation" value="turning_26" /> Turning 26 / aging off a parent’s plan</label>
+          <label class="choice"><input id="situation-self_employed" type="radio" name="situation" value="self_employed" /> Self-employed / 1099 / between jobs</label>
+          <label class="choice"><input id="situation-cobra" type="radio" name="situation" value="cobra" /> COBRA decision</label>
+          <label class="choice"><input id="situation-other" type="radio" name="situation" value="other" /> Other life change</label>
+          <label class="choice"><input id="situation-not_sure" type="radio" name="situation" value="not_sure" /> I’m not sure</label>
         </div>
       </section>
 
@@ -44,11 +44,11 @@ const { context = 'general' } = Astro.props;
       <section class="funnel-step" data-step="4" data-step-name="coverage_household">
         <p class="eyebrow">Coverage and household</p><h2>Who needs coverage, and how large is your tax household?</h2>
         <div class="choice-grid compact-choices">
-          <label class="choice"><input type="radio" name="coverageFor" value="self" required /> Just me</label>
-          <label class="choice"><input type="radio" name="coverageFor" value="self_spouse" /> Me and my spouse</label>
-          <label class="choice"><input type="radio" name="coverageFor" value="self_children" /> Me and child or children</label>
-          <label class="choice"><input type="radio" name="coverageFor" value="family" /> My family</label>
-          <label class="choice"><input type="radio" name="coverageFor" value="other" /> Someone else</label>
+          <label class="choice"><input id="coverageFor-self" type="radio" name="coverageFor" value="self" required /> Just me</label>
+          <label class="choice"><input id="coverageFor-self_spouse" type="radio" name="coverageFor" value="self_spouse" /> Me and my spouse</label>
+          <label class="choice"><input id="coverageFor-self_children" type="radio" name="coverageFor" value="self_children" /> Me and child or children</label>
+          <label class="choice"><input id="coverageFor-family" type="radio" name="coverageFor" value="family" /> My family</label>
+          <label class="choice"><input id="coverageFor-other" type="radio" name="coverageFor" value="other" /> Someone else</label>
         </div>
         <div class="field"><label for="household-size">Tax household size</label><select id="household-size" name="householdSize" required><option value="">Choose one</option>{Array.from({length: 8}, (_, i) => <option value={i + 1}>{i + 1}{i === 7 ? '+' : ''}</option>)}</select></div>
         <p class="muted">Usually the tax filer, spouse, and tax dependents—even if they do not all need coverage.</p>
@@ -57,12 +57,12 @@ const { context = 'general' } = Astro.props;
       <section class="funnel-step" data-step="5" data-step-name="income_range">
         <p class="eyebrow">Expected yearly income</p><h2>What do you expect your household to earn this year?</h2>
         <div class="choice-grid">
-          <label class="choice"><input type="radio" name="incomeRange" value="under_16000" required /> Under $16,000</label>
-          <label class="choice"><input type="radio" name="incomeRange" value="16000_29999" /> $16,000–$29,999</label>
-          <label class="choice"><input type="radio" name="incomeRange" value="30000_49999" /> $30,000–$49,999</label>
-          <label class="choice"><input type="radio" name="incomeRange" value="50000_79999" /> $50,000–$79,999</label>
-          <label class="choice"><input type="radio" name="incomeRange" value="80000_plus" /> $80,000 or more</label>
-          <label class="choice"><input type="radio" name="incomeRange" value="unsure" /> I’m not sure yet</label>
+          <label class="choice"><input id="incomeRange-under_16000" type="radio" name="incomeRange" value="under_16000" required /> Under $16,000</label>
+          <label class="choice"><input id="incomeRange-16000_29999" type="radio" name="incomeRange" value="16000_29999" /> $16,000–$29,999</label>
+          <label class="choice"><input id="incomeRange-30000_49999" type="radio" name="incomeRange" value="30000_49999" /> $30,000–$49,999</label>
+          <label class="choice"><input id="incomeRange-50000_79999" type="radio" name="incomeRange" value="50000_79999" /> $50,000–$79,999</label>
+          <label class="choice"><input id="incomeRange-80000_plus" type="radio" name="incomeRange" value="80000_plus" /> $80,000 or more</label>
+          <label class="choice"><input id="incomeRange-unsure" type="radio" name="incomeRange" value="unsure" /> I’m not sure yet</label>
         </div>
         <p class="muted">Marketplace savings use expected full-year household income, including income earned before a job loss.</p>
       </section>
@@ -70,11 +70,11 @@ const { context = 'general' } = Astro.props;
       <section class="funnel-step" data-step="6" data-step-name="coverage_status">
         <p class="eyebrow">Current situation</p><h2>Which best describes your coverage now?</h2>
         <div class="choice-grid">
-          <label class="choice"><input type="radio" name="coverageStatus" value="ending" required /> Coverage will end soon</label>
-          <label class="choice"><input type="radio" name="coverageStatus" value="lost" /> Coverage already ended</label>
-          <label class="choice"><input type="radio" name="coverageStatus" value="cobra_offered" /> COBRA was offered</label>
-          <label class="choice"><input type="radio" name="coverageStatus" value="on_cobra" /> I’m enrolled in COBRA</label>
-          <label class="choice"><input type="radio" name="coverageStatus" value="uninsured" /> I do not currently have coverage</label>
+          <label class="choice"><input id="coverageStatus-ending" type="radio" name="coverageStatus" value="ending" required /> Coverage will end soon</label>
+          <label class="choice"><input id="coverageStatus-lost" type="radio" name="coverageStatus" value="lost" /> Coverage already ended</label>
+          <label class="choice"><input id="coverageStatus-cobra_offered" type="radio" name="coverageStatus" value="cobra_offered" /> COBRA was offered</label>
+          <label class="choice"><input id="coverageStatus-on_cobra" type="radio" name="coverageStatus" value="on_cobra" /> I’m enrolled in COBRA</label>
+          <label class="choice"><input id="coverageStatus-uninsured" type="radio" name="coverageStatus" value="uninsured" /> I do not currently have coverage</label>
         </div>
       </section>
 
@@ -87,20 +87,36 @@ const { context = 'general' } = Astro.props;
       <section class="funnel-step" data-step="8" data-step-name="phone_consent">
         <p class="eyebrow">Final step</p><h2>What is the best number to reach you?</h2>
         <div class="field"><label for="phone">Phone number</label><input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="(772) 555-0123" required /></div>
-        <label class="choice"><input type="checkbox" name="consent" value="yes" required /> <span>I agree to the contact and sharing terms below.</span></label>
-        <p class="consent-copy">{CONSENT_TEXT}</p>
-        <p class="consent-copy">HealthCoveragePath is not HealthCare.gov or a government website. A licensed insurance professional or approved partner may contact you. You may also use HealthCare.gov directly without submitting this form.</p>
+        <div class="consent-block" data-tf-element-role="consent-language">
+          <label class="choice"><input id="consent" type="checkbox" name="consent" value="yes" data-tf-element-role="consent-opt-in" required /> <span>I agree to the contact and sharing terms below.</span></label>
+          <p class="consent-copy">{CONSENT_TEXT}</p>
+          <p class="consent-copy">HealthCoveragePath is not HealthCare.gov or a government website. A licensed insurance professional or approved partner may contact you. You may also use HealthCare.gov directly without submitting this form.</p>
+        </div>
       </section>
 
       <section class="funnel-step" data-step="9" data-step-name="success" aria-live="polite">
         <div class="success-mark" aria-hidden="true">✓</div><h2>Thanks—your coverage request is in.</h2><p>We saved the details you provided. If your request can be matched, a licensed insurance professional or approved coverage partner may contact you about available options.</p><p class="muted">Submitting this form does not enroll you in a plan. For immediate official Marketplace help, visit <a href="https://www.healthcare.gov/">HealthCare.gov</a>.</p>
       </section>
       <div class="funnel-error" id="funnel-error" role="alert"></div>
-      <div class="funnel-actions"><button class="button secondary small" type="button" data-back hidden>Back</button><button class="button" type="button" data-next>Continue</button></div>
+      <div class="funnel-actions"><button class="button secondary small" type="button" name="back" data-back hidden>Back</button><button class="button" type="submit" name="lead_submit" data-next data-tf-element-role="submit"><span data-tf-element-role="submit-text">Continue</span></button></div>
     </form>
   </div>
 </div>
 <div class="mobile-cta"><button class="button" type="button" data-funnel-open data-analytics="mobile_sticky_cta">Check My Options</button></div>
+
+<script is:inline type="text/javascript">
+  (() => {
+    const tf = document.createElement('script');
+    tf.type = 'text/javascript';
+    tf.async = true;
+    tf.src = (document.location.protocol === 'https:' ? 'https' : 'http') +
+      '://api.trustedform.com/trustedform.js?field=xxTrustedFormCertUrl&use_tagged_consent=true&l=' +
+      new Date().getTime() + Math.random();
+    const firstScript = document.getElementsByTagName('script')[0];
+    firstScript?.parentNode?.insertBefore(tf, firstScript);
+  })();
+</script>
+<noscript><img src="https://api.trustedform.com/ns.gif" alt="" /></noscript>
 
 <script>
   type FirstTouch = { originalLandingUrl:string; originalLandingPath:string; referrer:string|null; attribution:Record<string,string|null> };
@@ -108,6 +124,7 @@ const { context = 'general' } = Astro.props;
   const form = document.querySelector<HTMLFormElement>('#lead-form');
   const error = document.querySelector<HTMLElement>('#funnel-error');
   const next = document.querySelector<HTMLButtonElement>('[data-next]');
+  const nextLabel = next?.querySelector<HTMLElement>('[data-tf-element-role="submit-text"]');
   const back = document.querySelector<HTMLButtonElement>('[data-back]');
   const close = document.querySelector<HTMLButtonElement>('.funnel-close');
   const steps = Array.from(document.querySelectorAll<HTMLElement>('.funnel-step'));
@@ -133,6 +150,10 @@ const { context = 'general' } = Astro.props;
   };
 
   const currentContext = () => contextInput?.value || initialContext;
+  const readTrustedFormCertificate = () => {
+    const value = ((form?.elements.namedItem('xxTrustedFormCertUrl') as HTMLInputElement | null)?.value || '').trim();
+    return value.startsWith('https://cert.trustedform.com/') ? value : null;
+  };
   const track = (event: string, detail: Record<string, unknown> = {}) => {
     const payload = { event, landing_page: location.pathname, funnel_context: currentContext(), ...detail };
     window.dispatchEvent(new CustomEvent('hcp:analytics', { detail: payload }));
@@ -150,7 +171,7 @@ const { context = 'general' } = Astro.props;
     if (!options) return;
     options.replaceChildren(...set.options.map(([value,label], index) => {
       const wrapper = document.createElement('label'); wrapper.className = 'choice';
-      const input = document.createElement('input'); input.type = 'radio'; input.name = 'timingBucket'; input.value = value; input.required = index === 0;
+      const input = document.createElement('input'); input.id = `timing-${context}-${value}`; input.type = 'radio'; input.name = 'timingBucket'; input.value = value; input.required = index === 0;
       wrapper.append(input, document.createTextNode(` ${label}`)); return wrapper;
     }));
   };
@@ -165,7 +186,7 @@ const { context = 'general' } = Astro.props;
     if (bar) bar.style.width = `${position / flow.length * 100}%`;
     progress?.setAttribute('aria-valuemax', String(flow.length)); progress?.setAttribute('aria-valuenow', String(position));
     if (back) back.hidden = index === 0 || stepNumber === 9;
-    if (next) { next.hidden = stepNumber === 9; next.textContent = index === flow.length - 1 ? 'Check My Options' : 'Continue'; }
+    if (next) { next.hidden = stepNumber === 9; if (nextLabel) nextLabel.textContent = index === flow.length - 1 ? 'Check My Options' : 'Continue'; }
     if (error) error.textContent = '';
     steps.find((el) => Number(el.dataset.step) === stepNumber)?.querySelector<HTMLElement>('input, select, button')?.focus();
   };
@@ -212,8 +233,9 @@ const { context = 'general' } = Astro.props;
     input.closest('.choice')?.classList.add('selected');
   });
   back?.addEventListener('click', () => show(Math.max(0, flowIndex - 1)));
-  next?.addEventListener('click', async () => {
-    if (!form || !valid()) return;
+  form?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (!form || !next || !valid()) return;
     const active = activeStep();
     if (flow[flowIndex] === 1) {
       const selected = (form.elements.namedItem('situation') as RadioNodeList)?.value;
@@ -224,8 +246,13 @@ const { context = 'general' } = Astro.props;
       track('funnel_step_complete', { step_number:flowIndex + 1, step_name:active?.dataset.stepName, total_steps:flow.length });
       show(flowIndex + 1); return;
     }
-    next.disabled = true; next.textContent = 'Checking…';
-    const data = Object.fromEntries(new FormData(form).entries());
+    next.disabled = true; if (nextLabel) nextLabel.textContent = 'Checking…';
+    const data = Object.fromEntries(new FormData(form).entries()) as Record<string, string>;
+    delete data.xxTrustedFormToken;
+    delete data.xxTrustedFormPingUrl;
+    const trustedFormCertificateUrl = readTrustedFormCertificate();
+    track(trustedFormCertificateUrl ? 'trustedform_certificate_available' : 'trustedform_certificate_missing');
+    if (trustedFormCertificateUrl && !data.xxTrustedFormCertUrl) data.xxTrustedFormCertUrl = trustedFormCertificateUrl;
     const firstTouch = (window as typeof window & { hcpGetAttribution?:()=>FirstTouch }).hcpGetAttribution?.();
     const payload = { ...data, originalLandingUrl:firstTouch?.originalLandingUrl || location.pathname,
       originalLandingPath:firstTouch?.originalLandingPath || location.pathname, submissionPath:location.pathname,
@@ -244,7 +271,7 @@ const { context = 'general' } = Astro.props;
     } catch {
       track('lead_failure', { step_number:flow.length, step_name:active?.dataset.stepName, total_steps:flow.length });
       if (error) error.textContent = 'We could not securely save your request. Your answers remain here so you can try again.';
-      next.disabled = false; next.textContent = 'Check My Options';
+      next.disabled = false; if (nextLabel) nextLabel.textContent = 'Check My Options';
     }
   });
 </script>
