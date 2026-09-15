@@ -97,9 +97,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     if (!(await claimRequestQuota(env.DB, rateKey, (bucket + 1) * windowMs, 8))) return json({ ok: false, error: 'Too many requests. Please try again later.' }, 429);
   }
 
-  const tokenTest = Boolean(env.TEST_SUBMISSION_TOKEN && raw.testSubmission === true && request.headers.get('x-hcp-test-token') === env.TEST_SUBMISSION_TOKEN);
-  const productionQueryTest = raw.testSubmission === true && request.headers.get('origin') === 'https://healthcoveragepath.com';
-  const isTest = tokenTest || productionQueryTest;
+  const isTest = Boolean(env.TEST_SUBMISSION_TOKEN && raw.testSubmission === true && request.headers.get('x-hcp-test-token') === env.TEST_SUBMISSION_TOKEN);
   const duplicateKey = await fingerprint(`${email}|${phone}|${zip}`);
   const now = Date.now();
   if (!(await claimLeadFingerprint(env.DB, duplicateKey, now))) return json({ ok: true, duplicate: true, status: 'held' }, 202);
@@ -124,23 +122,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
   const routing = await routeLead(lead, env);
   try { await saveRoutingResult(env.DB, lead.id, routing); }
   catch (cause) { console.error(JSON.stringify({ event: 'routing_audit_failed', leadId: lead.id, status: routing.status, error: cause instanceof Error ? cause.name : 'unknown' })); }
-  let testVerification: { certificatePersisted:boolean; trustedFormStatus:string|null; routingStatus:string|null; buyerDelivery:'disabled' } | undefined;
-  if (isTest) {
-    try {
-      const persisted = await env.DB.prepare('SELECT trustedform_cert_url, trustedform_status, routing_status FROM leads WHERE id = ?').bind(lead.id).first<{ trustedform_cert_url:string|null; trustedform_status:string|null; routing_status:string|null }>();
-      testVerification = {
-        certificatePersisted: Boolean(persisted?.trustedform_cert_url && persisted.trustedform_status === 'available'),
-        trustedFormStatus: persisted?.trustedform_status ?? null,
-        routingStatus: persisted?.routing_status ?? routing.status,
-        buyerDelivery: 'disabled',
-      };
-    } catch (cause) {
-      console.error(JSON.stringify({ event:'trustedform_test_readback_failed', leadId:lead.id, error:cause instanceof Error ? cause.name : 'unknown' }));
-      testVerification = { certificatePersisted:false, trustedFormStatus:null, routingStatus:routing.status, buyerDelivery:'disabled' };
-    }
-  }
   console.log(JSON.stringify({ event: 'lead_submission', leadId: lead.id, context: lead.context, routingStatus: routing.status, isTest }));
-  return json({ ok: true, id: lead.id, status: routing.status, ...(testVerification ? { testVerification } : {}) }, routing.status === 'delivered' ? 200 : 202);
+  return json({ ok: true, id: lead.id, status: routing.status }, routing.status === 'delivered' ? 200 : 202);
 };
 
 export const ALL: APIRoute = () => json({ ok: false, error: 'Method not allowed' }, 405);
