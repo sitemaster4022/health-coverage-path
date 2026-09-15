@@ -257,7 +257,7 @@ const { context = 'general' } = Astro.props;
     const payload = { ...data, originalLandingUrl:firstTouch?.originalLandingUrl || location.pathname,
       originalLandingPath:firstTouch?.originalLandingPath || location.pathname, submissionPath:location.pathname,
       referrer:firstTouch?.referrer || document.referrer || null, attribution:firstTouch?.attribution || {},
-
+      startedAt, completedAt:Date.now() };
     try {
       track('lead_submit', { step_number:flow.length, step_name:active?.dataset.stepName, total_steps:flow.length });
       const response = await fetch('/api/leads', { method:'POST', headers:{ 'content-type':'application/json' }, body:JSON.stringify(payload) });
