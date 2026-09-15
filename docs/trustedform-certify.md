@@ -79,8 +79,8 @@ URL and the explicit buyer-delivery flag are configured.
 
 ## CSP
 
-The CSP adds only the documented SDK origin
-`https://api.trustedform.com` to:
+The CSP adds only the documented SDK origins
+`https://api.trustedform.com` and `https://cdn.trustedform.com` to:
 
 - `script-src`, for the Web SDK script;
 - `connect-src`, for SDK network requests;
@@ -146,6 +146,13 @@ incorrect script/form order, an outage, and missing or incorrect consent tags.
 The client emits only `trustedform_certificate_available` or
 `trustedform_certificate_missing`; it never sends the full URL to ordinary
 analytics.
+
+## Production-origin deployment note
+
+A branch preview uses a non-production `workers.dev` origin and cannot prove
+certificate issuance for the confirmed `healthcoveragepath.com` origin.
+Production-origin validation must therefore run only after the configured
+Cloudflare production branch has deployed successfully.
 
 ## Disable or remove safely
 
