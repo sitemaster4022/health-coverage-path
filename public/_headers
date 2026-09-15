@@ -1,5 +1,5 @@
 /*
-  Content-Security-Policy: default-src 'self'; base-uri 'self'; connect-src 'self' https://api.trustedform.com; form-action 'self'; frame-ancestors 'none'; img-src 'self' data: https://api.trustedform.com; object-src 'none'; script-src 'self' 'unsafe-inline' https://api.trustedform.com; style-src 'self' 'unsafe-inline'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; connect-src 'self' https://api.trustedform.com https://cdn.trustedform.com; form-action 'self'; frame-ancestors 'none'; img-src 'self' data: https://api.trustedform.com https://cdn.trustedform.com; object-src 'none'; script-src 'self' 'unsafe-inline' https://api.trustedform.com https://cdn.trustedform.com; style-src 'self' 'unsafe-inline'; upgrade-insecure-requests
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
   X-Content-Type-Options: nosniff
