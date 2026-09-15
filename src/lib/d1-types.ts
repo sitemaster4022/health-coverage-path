@@ -2,7 +2,7 @@
 export const TRUSTEDFORM_STATUSES = ['available', 'missing'] as const;
 export type TrustedFormStatus = typeof TRUSTEDFORM_STATUSES[number];
 
-export interface D1Result<T = Record<string, unknown>>
+export interface D1Result<T = Record<string, unknown>> {
   results: T[];
   success: boolean;
   meta: Record<string, unknown>;
