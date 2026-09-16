@@ -15,8 +15,9 @@ const { context = 'general' } = Astro.props;
       <input type="hidden" name="consentVersion" value={CONSENT_VERSION} />
 
       <section class="funnel-step" data-step="1" data-step-name="coverage_change">
-        <p class="eyebrow">First, what changed</p>
-        <h2 id="funnel-title">What changed with your coverage?</h2>
+        <p class="eyebrow">Your situation</p>
+        <h2 id="funnel-title">What brought you here today?</h2>
+        <p class="muted">This helps us check which enrollment paths may apply to your situation.</p>
         <div class="choice-grid">
           <label class="choice"><input id="situation-job_loss" type="radio" name="situation" value="job_loss" required /> Lost job-based coverage</label>
           <label class="choice"><input id="situation-medicaid_loss" type="radio" name="situation" value="medicaid_loss" /> Losing or lost Medicaid</label>
@@ -32,17 +33,17 @@ const { context = 'general' } = Astro.props;
         <p class="eyebrow">Coverage timing</p>
         <h2 id="timing-title">When did your coverage end—or when will it end?</h2>
         <div class="choice-grid" id="timing-options"></div>
-        <p class="muted" id="timing-help">A general range is enough for this review.</p>
+        <p class="muted" id="timing-help">Timing can affect whether a Special Enrollment Period may be available.</p>
       </section>
 
       <section class="funnel-step" data-step="3" data-step-name="florida_zip">
-        <p class="eyebrow">Your area</p><h2>What is your Florida ZIP code?</h2>
+        <p class="eyebrow">Start with your area</p><h2>What is your ZIP code?</h2>
         <div class="field"><label for="zip">ZIP code</label><input id="zip" name="zip" inputmode="numeric" autocomplete="postal-code" maxlength="5" pattern="[0-9]{5}" placeholder="34952" required /></div>
-        <p class="muted">Plan availability and prices vary by county.</p>
+        <p class="muted">Health plans and prices vary by area. Your ZIP helps us narrow down the options available where you live.</p>
       </section>
 
       <section class="funnel-step" data-step="4" data-step-name="coverage_household">
-        <p class="eyebrow">Coverage and household</p><h2>Who needs coverage, and how large is your tax household?</h2>
+        <p class="eyebrow">Coverage and household</p><h2>Who needs coverage?</h2>
         <div class="choice-grid compact-choices">
           <label class="choice"><input id="coverageFor-self" type="radio" name="coverageFor" value="self" required /> Just me</label>
           <label class="choice"><input id="coverageFor-self_spouse" type="radio" name="coverageFor" value="self_spouse" /> Me and my spouse</label>
@@ -51,7 +52,7 @@ const { context = 'general' } = Astro.props;
           <label class="choice"><input id="coverageFor-other" type="radio" name="coverageFor" value="other" /> Someone else</label>
         </div>
         <div class="field"><label for="household-size">Tax household size</label><select id="household-size" name="householdSize" required><option value="">Choose one</option>{Array.from({length: 8}, (_, i) => <option value={i + 1}>{i + 1}{i === 7 ? '+' : ''}</option>)}</select></div>
-        <p class="muted">Usually the tax filer, spouse, and tax dependents—even if they do not all need coverage.</p>
+        <p class="muted">Household size can affect the income limits used to estimate Marketplace savings. Marketplace savings are based partly on the size of your tax household, even if not everyone needs coverage. This helps us give you a more accurate picture of what you may qualify for.</p>
       </section>
 
       <section class="funnel-step" data-step="5" data-step-name="income_range">
@@ -64,11 +65,13 @@ const { context = 'general' } = Astro.props;
           <label class="choice"><input id="incomeRange-80000_plus" type="radio" name="incomeRange" value="80000_plus" /> $80,000 or more</label>
           <label class="choice"><input id="incomeRange-unsure" type="radio" name="incomeRange" value="unsure" /> I’m not sure yet</label>
         </div>
-        <p class="muted">Marketplace savings use expected full-year household income, including income earned before a job loss.</p>
+        <p class="muted">Your estimated income is one of the main factors used to determine whether you may qualify for savings that lower your monthly premium. Marketplace savings use expected full-year household income, including income earned before a job loss.</p>
+        <p class="muted">This may help identify potential premium savings; the official Marketplace makes the eligibility decision.</p>
       </section>
 
       <section class="funnel-step" data-step="6" data-step-name="coverage_status">
-        <p class="eyebrow">Current situation</p><h2>Which best describes your coverage now?</h2>
+        <p class="eyebrow">Current coverage</p><h2>Which best describes your coverage right now?</h2>
+        <p class="muted">This helps us understand which next steps may fit your situation.</p>
         <div class="choice-grid">
           <label class="choice"><input id="coverageStatus-ending" type="radio" name="coverageStatus" value="ending" required /> Coverage will end soon</label>
           <label class="choice"><input id="coverageStatus-lost" type="radio" name="coverageStatus" value="lost" /> Coverage already ended</label>
@@ -79,13 +82,15 @@ const { context = 'general' } = Astro.props;
       </section>
 
       <section class="funnel-step" data-step="7" data-step-name="contact_identity">
-        <p class="eyebrow">Where to send your result</p><h2>Who should we prepare the coverage review for?</h2>
+        <p class="eyebrow">Request help</p><h2>We have enough information to narrow down your next steps.</h2>
+        <p class="muted">Enter your contact information to request help reviewing coverage options available in your area.</p>
         <div class="grid-2"><div class="field"><label for="first-name">First name</label><input id="first-name" name="firstName" autocomplete="given-name" required /></div><div class="field"><label for="last-name">Last name</label><input id="last-name" name="lastName" autocomplete="family-name" required /></div></div>
         <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" required /></div>
       </section>
 
       <section class="funnel-step" data-step="8" data-step-name="phone_consent">
         <p class="eyebrow">Final step</p><h2>What is the best number to reach you?</h2>
+        <p class="muted">A phone number lets a licensed insurance professional or approved partner follow up about coverage options. We ask for it last, after the coverage questions.</p>
         <div class="field"><label for="phone">Phone number</label><input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="(772) 555-0123" required /></div>
         <div class="consent-block" data-tf-element-role="consent-language">
           <label class="choice"><input id="consent" type="checkbox" name="consent" value="yes" data-tf-element-role="consent-opt-in" required /> <span>I agree to the contact and sharing terms below.</span></label>
@@ -130,23 +135,25 @@ const { context = 'general' } = Astro.props;
   const steps = Array.from(document.querySelectorAll<HTMLElement>('.funnel-step'));
   const contextInput = form?.elements.namedItem('context') as HTMLInputElement | null;
   const initialContext = modal?.dataset.context || 'general';
-  const directFlow = [2,3,4,5,6,7,8];
-  let flow = initialContext === 'general' ? [1,...directFlow] : directFlow;
+  const STEP = { situation:1, timing:2, zip:3, household:4, income:5, status:6, contact:7, consent:8, success:9 } as const;
+  const generalFlow = [STEP.zip, STEP.household, STEP.income, STEP.situation, STEP.timing, STEP.status, STEP.contact, STEP.consent];
+  const targetedFlow = [STEP.zip, STEP.household, STEP.income, STEP.timing, STEP.status, STEP.contact, STEP.consent];
+  let flow = initialContext === 'general' ? [...generalFlow] : [...targetedFlow];
   let flowIndex = 0;
   let startedAt = 0;
   let completed = false;
   let previousFocus: HTMLElement | null = null;
 
   const timingSets: Record<string, { title:string; help:string; options:[string,string][] }> = {
-    job_loss:{ title:'When did your employer coverage end—or when will it end?', help:'A general range is enough. Timing helps identify possible enrollment windows.', options:[['already_ended','Coverage already ended'],['next_30','Ends within the next 30 days'],['days_31_60','Ends in 31–60 days'],['over_60_future','Ends more than 60 days from now'],['over_60_past','Ended more than 60 days ago'],['unsure','I’m not sure']] },
-    cobra:{ title:'When did your employer coverage end—or when will it end?', help:'This helps compare Marketplace timing with your COBRA election window.', options:[['already_ended','Coverage already ended'],['next_30','Ends within the next 30 days'],['days_31_60','Ends in 31–60 days'],['over_60_future','Ends more than 60 days from now'],['over_60_past','Ended more than 60 days ago'],['unsure','I’m not sure']] },
-    medicaid_loss:{ title:'When did your Medicaid coverage end—or when will it end?', help:'A range is enough to check the likely next steps.', options:[['already_ended','Medicaid already ended'],['next_30','Ends within the next 30 days'],['days_31_60','Ends in 31–60 days'],['over_60_future','Ends more than 60 days from now'],['over_60_past','Ended more than 60 days ago'],['unsure','I’m not sure']] },
-    turning_26:{ title:'When will coverage through a parent end?', help:'The plan type can affect the exact end date; a range is enough here.', options:[['already_ended','It already ended'],['next_30','Within the next 30 days'],['days_31_60','In 31–60 days'],['over_60_future','More than 60 days from now'],['over_60_past','It ended more than 60 days ago'],['unsure','I’m not sure']] },
-    self_employed:{ title:'When do you need new coverage to start?', help:'Choose the closest range.', options:[['need_now','As soon as possible'],['next_30','Within the next 30 days'],['days_31_60','In 31–60 days'],['over_60_future','More than 60 days from now'],['unsure','I’m not sure']] },
-    special_enrollment:{ title:'When did the life change happen?', help:'A general range is enough to organize the possible enrollment window.', options:[['event_last_30','Within the last 30 days'],['event_31_60','31–60 days ago'],['event_over_60','More than 60 days ago'],['next_30','It will happen within 30 days'],['unsure','I’m not sure']] },
-    unemployed:{ title:'When did your previous coverage end—or when will it end?', help:'A general range is enough.', options:[['already_ended','Coverage already ended'],['next_30','Ends within the next 30 days'],['days_31_60','Ends in 31–60 days'],['over_60_future','Ends more than 60 days from now'],['over_60_past','Ended more than 60 days ago'],['unsure','I’m not sure']] },
-    other:{ title:'When did the coverage change happen?', help:'Choose the closest range.', options:[['event_last_30','Within the last 30 days'],['event_31_60','31–60 days ago'],['event_over_60','More than 60 days ago'],['next_30','It will happen within 30 days'],['unsure','I’m not sure']] },
-    not_sure:{ title:'When did your coverage change—or when do you need coverage?', help:'Choose the closest answer. It is okay to be unsure.', options:[['already_ended','Coverage already ended'],['need_now','I need coverage as soon as possible'],['next_30','A change is coming within 30 days'],['days_31_60','A change is coming in 31–60 days'],['unsure','I’m not sure']] },
+    job_loss:{ title:'When did your employer coverage end—or when will it end?', help:'Timing can affect whether a Special Enrollment Period may be available. A general range is enough.', options:[['already_ended','Coverage already ended'],['next_30','Ends within the next 30 days'],['days_31_60','Ends in 31–60 days'],['over_60_future','Ends more than 60 days from now'],['over_60_past','Ended more than 60 days ago'],['unsure','I’m not sure']] },
+    cobra:{ title:'When did your employer coverage end—or when will it end?', help:'Timing can affect whether a Special Enrollment Period may be available and helps compare it with your COBRA election window.', options:[['already_ended','Coverage already ended'],['next_30','Ends within the next 30 days'],['days_31_60','Ends in 31–60 days'],['over_60_future','Ends more than 60 days from now'],['over_60_past','Ended more than 60 days ago'],['unsure','I’m not sure']] },
+    medicaid_loss:{ title:'When did your Medicaid coverage end—or when will it end?', help:'Timing can affect whether a Special Enrollment Period may be available. A general range is enough.', options:[['already_ended','Medicaid already ended'],['next_30','Ends within the next 30 days'],['days_31_60','Ends in 31–60 days'],['over_60_future','Ends more than 60 days from now'],['over_60_past','Ended more than 60 days ago'],['unsure','I’m not sure']] },
+    turning_26:{ title:'When will coverage through a parent end?', help:'Timing can affect whether a Special Enrollment Period may be available. The plan type can affect the exact end date; a range is enough.', options:[['already_ended','It already ended'],['next_30','Within the next 30 days'],['days_31_60','In 31–60 days'],['over_60_future','More than 60 days from now'],['over_60_past','It ended more than 60 days ago'],['unsure','I’m not sure']] },
+    self_employed:{ title:'When do you need new coverage to start?', help:'Timing can affect whether a Special Enrollment Period may be available. Choose the closest range.', options:[['need_now','As soon as possible'],['next_30','Within the next 30 days'],['days_31_60','In 31–60 days'],['over_60_future','More than 60 days from now'],['unsure','I’m not sure']] },
+    special_enrollment:{ title:'When did the life change happen?', help:'Timing can affect whether a Special Enrollment Period may be available. A general range is enough to organize the possible enrollment window.', options:[['event_last_30','Within the last 30 days'],['event_31_60','31–60 days ago'],['event_over_60','More than 60 days ago'],['next_30','It will happen within 30 days'],['unsure','I’m not sure']] },
+    unemployed:{ title:'When did your previous coverage end—or when will it end?', help:'Timing can affect whether a Special Enrollment Period may be available. A general range is enough.', options:[['already_ended','Coverage already ended'],['next_30','Ends within the next 30 days'],['days_31_60','Ends in 31–60 days'],['over_60_future','Ends more than 60 days from now'],['over_60_past','Ended more than 60 days ago'],['unsure','I’m not sure']] },
+    other:{ title:'When did the coverage change happen?', help:'Timing can affect whether a Special Enrollment Period may be available. Choose the closest range.', options:[['event_last_30','Within the last 30 days'],['event_31_60','31–60 days ago'],['event_over_60','More than 60 days ago'],['next_30','It will happen within 30 days'],['unsure','I’m not sure']] },
+    not_sure:{ title:'When did your coverage change—or when do you need coverage?', help:'Timing can affect whether a Special Enrollment Period may be available. Choose the closest answer—it is okay to be unsure.', options:[['already_ended','Coverage already ended'],['need_now','I need coverage as soon as possible'],['next_30','A change is coming within 30 days'],['days_31_60','A change is coming in 31–60 days'],['unsure','I’m not sure']] },
   };
 
   const currentContext = () => contextInput?.value || initialContext;
@@ -185,8 +192,21 @@ const { context = 'general' } = Astro.props;
     const position = Math.min(index + 1, flow.length);
     if (bar) bar.style.width = `${position / flow.length * 100}%`;
     progress?.setAttribute('aria-valuemax', String(flow.length)); progress?.setAttribute('aria-valuenow', String(position));
-    if (back) back.hidden = index === 0 || stepNumber === 9;
-    if (next) { next.hidden = stepNumber === 9; if (nextLabel) nextLabel.textContent = index === flow.length - 1 ? 'Check My Options' : 'Continue'; }
+    if (back) back.hidden = index === 0 || stepNumber === STEP.success;
+    if (next) {
+      next.hidden = stepNumber === STEP.success;
+      if (nextLabel) {
+        nextLabel.textContent = stepNumber === STEP.success
+          ? ''
+          : index === flow.length - 1
+            ? 'Check My Options'
+            : stepNumber === STEP.zip
+              ? 'See Available Options'
+              : stepNumber === STEP.income
+                ? 'Check Potential Savings'
+                : 'Continue';
+      }
+    }
     if (error) error.textContent = '';
     steps.find((el) => Number(el.dataset.step) === stepNumber)?.querySelector<HTMLElement>('input, select, button')?.focus();
   };
@@ -196,7 +216,7 @@ const { context = 'general' } = Astro.props;
     for (const field of Array.from(activeStep()?.querySelectorAll<HTMLInputElement | HTMLSelectElement>('input, select') ?? [])) {
       if (!field.checkValidity()) { field.reportValidity(); return false; }
     }
-    if (flow[flowIndex] === 3) {
+    if (flow[flowIndex] === STEP.zip) {
       const zip = (form?.elements.namedItem('zip') as HTMLInputElement)?.value ?? '';
       if (!/^3\d{4}$/.test(zip)) { if (error) error.textContent = 'Enter a valid Florida ZIP code.'; return false; }
     }
@@ -207,7 +227,7 @@ const { context = 'general' } = Astro.props;
   const open = (trigger: HTMLElement) => {
     if (!modal) return;
     previousFocus = trigger; startedAt = Date.now(); completed = false;
-    flow = initialContext === 'general' ? [1,...directFlow] : directFlow; flowIndex = 0;
+    flow = initialContext === 'general' ? [...generalFlow] : [...targetedFlow]; flowIndex = 0;
     if (contextInput) contextInput.value = initialContext;
     if (next) next.disabled = false;
     renderTiming(initialContext);
@@ -237,7 +257,7 @@ const { context = 'general' } = Astro.props;
     event.preventDefault();
     if (!form || !next || !valid()) return;
     const active = activeStep();
-    if (flow[flowIndex] === 1) {
+    if (flow[flowIndex] === STEP.situation) {
       const selected = (form.elements.namedItem('situation') as RadioNodeList)?.value;
       if (contextInput) contextInput.value = selected;
       renderTiming(selected);
@@ -266,7 +286,7 @@ const { context = 'general' } = Astro.props;
       completed = true; track('funnel_step_complete', { step_number:flow.length, step_name:active?.dataset.stepName, total_steps:flow.length });
       if (result.duplicate) track('lead_duplicate', { routing_status:result.status });
       else track('lead_success', { lead_id:result.id, routing_status:result.status });
-      flow = [...flow,9]; show(flow.length - 1); form.reset();
+      flow = [...flow, STEP.success]; show(flow.length - 1); form.reset();
       form.querySelectorAll('.choice.selected').forEach((choice) => choice.classList.remove('selected'));
     } catch {
       track('lead_failure', { step_number:flow.length, step_name:active?.dataset.stepName, total_steps:flow.length });
